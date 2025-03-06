@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// white Mode
+// 화이트 모드 설정
 ThemeData whiteMode() {
   return ThemeData(
     useMaterial3: true,
@@ -13,7 +13,7 @@ ThemeData whiteMode() {
       error: Colors.redAccent, // Error color
     ),
     textTheme: GoogleFonts.poppinsTextTheme().copyWith(
-      displayLarge: GoogleFonts.montserrat(
+      displayLarge: GoogleFonts.notoSansKr(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         color: Colors.black,
@@ -78,6 +78,7 @@ ThemeData whiteMode() {
   );
 }
 
+// 다크 모드 설정
 ThemeData darkMode() {
   return ThemeData(
     useMaterial3: true,

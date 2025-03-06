@@ -1,7 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/theme/theme.dart';
+import 'package:kls_project/viewModel/theme_initialze.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // 확장을 위해 멀티 Provider 사용
+        ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
+      ],
+      child: ThemeInitialze(
+        // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
+        child: Consumer<ChangeThemeMode>(
+          builder: (context, changeMode, child) => const MyApp(),
+        ),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -12,24 +29,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: Provider.of<ChangeThemeMode>(context).themeData,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -83,7 +83,19 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title:
+            Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+        actions: [
+          IconButton(
+            onPressed:
+                Provider.of<ChangeThemeMode>(context).toggleBrightnessMode,
+            icon: Icon(
+              Provider.of<ChangeThemeMode>(context).themeData == whiteMode()
+                  ? Icons.light_mode_rounded
+                  : Icons.dark_mode_rounded,
+            ),
+          )
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -104,10 +116,13 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
+            Text(
+              'You have pushed the button this many times:',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
             Text(
               '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: Theme.of(context).textTheme.displayLarge,
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
 import 'package:kls_project/screen/SettingsScreen.dart';
+import 'package:kls_project/screen/YoutubeSearchScreen.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
@@ -94,42 +95,40 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
 
         // 검색 페이지
-        SafeArea(
-          child: Center(
-            child: Text('검색',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-          ),
-        ),
+        YoutubeSearchScreen(),
 
         // 검색 페이지
         SettingsScreen(),
       ][currentPageIndex],
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentPageIndex,
+        onTap: (index) {
           setState(() {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
-        selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        selectedItemColor:
+            Provider.of<ChangeThemeMode>(context).themeData == whiteMode()
+                ? Colors.black
+                : Colors.white,
+        unselectedItemColor: const Color(0xFF838383),
+        items: [
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.home),
             label: '홈',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.double_music_note),
             label: '음악',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.search),
             label: '검색',
           ),
-          NavigationDestination(
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.settings),
             label: '설정',
           ),

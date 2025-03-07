@@ -19,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           Text(
             "설정",
-            style: TextStyle(fontSize: 25),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           SizedBox(
             height: 20,

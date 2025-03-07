@@ -64,7 +64,7 @@ ThemeData whiteMode() {
     // 수정 필요
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF3c3c3c),
-      selectedItemColor: Color(0xffffffff),
+      selectedItemColor: Colors.black,
       unselectedItemColor: Color(0xFF838383),
       elevation: 8,
     ),
@@ -140,7 +140,7 @@ ThemeData darkMode() {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF3c3c3c),
-      selectedItemColor: Color(0xffffffff),
+      selectedItemColor: Colors.white,
       unselectedItemColor: Color(0xFF838383),
       elevation: 8,
     ),

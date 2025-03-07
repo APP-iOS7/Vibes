@@ -36,9 +36,9 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   @override
   void dispose() {
-    super.dispose();
     _youtubePlayerController.dispose();
-    print("dispose가 불림 하지만 이녀석 사라지지 않음! $_youtubePlayerController");
+    super.dispose();
+    print(_youtubePlayerController);
   }
 
   @override
@@ -142,10 +142,12 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             min: 0.0,
             max: 1.0,
             onChanged: (value) {
+              // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
+              _youtubePlayerController.setVolume((value * 100).toInt());
               setState(() {
-                // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
-                _youtubePlayerController.setVolume((value * 100).toInt());
                 soundVolume = (value * 100).toInt();
+                print(
+                    "controller volmune : ${_youtubePlayerController.value.volume}");
               });
             },
             activeColor: Theme.of(context).sliderTheme.activeTrackColor,

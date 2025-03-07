@@ -28,6 +28,11 @@ ThemeData whiteMode() {
         fontWeight: FontWeight.normal,
         color: Colors.black87,
       ),
+      bodySmall: GoogleFonts.poppins(
+        fontSize: 13,
+        fontWeight: FontWeight.normal,
+        color: Colors.black87,
+      ),
     ),
     listTileTheme: ListTileThemeData(
       iconColor: Color(0xFFef4f1c),
@@ -69,8 +74,8 @@ ThemeData whiteMode() {
       elevation: 8,
     ),
     sliderTheme: SliderThemeData(
-      activeTrackColor: const Color(0xFFE50914),
-      inactiveTrackColor: Colors.grey.shade400,
+      activeTrackColor: Colors.red,
+      inactiveTrackColor: const Color(0xFFE50914),
       thumbColor: const Color(0xFFE50914),
       overlayColor: const Color(0x29E50914),
       trackHeight: 4.0,
@@ -102,6 +107,11 @@ ThemeData darkMode() {
       ),
       bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: Colors.white70,
+      ),
+      bodySmall: GoogleFonts.poppins(
+        fontSize: 13,
         fontWeight: FontWeight.normal,
         color: Colors.white70,
       ),

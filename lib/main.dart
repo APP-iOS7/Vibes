@@ -5,7 +5,6 @@ import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
 import 'package:provider/provider.dart';
 
-
 void main() {
   runApp(
     MultiProvider(
@@ -31,13 +30,15 @@ class NavigationBarApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: Provider.of<ChangeThemeMode>(context).themeData,
-      home: const NavigationExample()),
+      home: const NavigationExample(title: 'KLS Music'),
     );
   }
 }
 
 class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+  const NavigationExample({super.key, required this.title});
+
+  final String title;
 
   @override
   State<NavigationExample> createState() => _NavigationExampleState();
@@ -52,7 +53,8 @@ class _NavigationExampleState extends State<NavigationExample> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+        title:
+            Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
         actions: [
           IconButton(
             onPressed:

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/screen/SettingsScreen.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
@@ -104,15 +105,7 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
 
         // 검색 페이지
-        SafeArea(
-          child: Center(
-            child: Text('설정',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-          ),
-        ),
+        SettingsScreen(),
       ][currentPageIndex],
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {

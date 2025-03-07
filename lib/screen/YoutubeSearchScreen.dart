@@ -5,7 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:youtube_scrape_api/models/video.dart';
 
 class YoutubeSearchScreen extends StatefulWidget {
-  const YoutubeSearchScreen({super.key});
+  final Stream<List<Video>> streamInjection;
+  const YoutubeSearchScreen({required this.streamInjection, super.key});
 
   @override
   State<YoutubeSearchScreen> createState() => _YoutubeSearchScreenState();
@@ -26,32 +27,37 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
             child: _queryTextField(context),
           ),
           Expanded(
             child: StreamBuilder(
-              stream: Provider.of<Youtubesearchstate>(context, listen: false)
-                  .searchResult,
+              stream: widget.streamInjection,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
-                print("stream Result :  ${snapshot.data}");
                 if (snapshot.hasError) {
+                  // 에러르 먼저 걸러서 다음처리에는 stream은 초기화가 안돼서 null상태
                   return Center(child: Text("문제가 있습니다.. ${snapshot.error}"));
-                }
-                if (snapshot.connectionState == ConnectionState.waiting &&
-                    _queryController.text.isNotEmpty &&
-                    snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
                 } else {
-                  if (_queryController.text.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "검색을 해요!",
-                        style: Theme.of(context).textTheme.bodyLarge,
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // stream = null == snapshot.connectionState 입니다
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque, // 빈 영역에서도 터치 감지
+                      onTap: () =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: Text(
+                          "추천 ex) 만두쌤의 코딩 한 코집",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
                       ),
                     );
+                  } else {
+                    if (_queryController.text.isEmpty && !snapshot.hasData) {}
+                    return _searchListView(snapshot);
                   }
-                  return _searchListView(snapshot);
                 }
               },
             ),
@@ -68,12 +74,15 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         hintText: "듣고 싶은 음악을 선택해주세요",
+        hintStyle: Theme.of(context).textTheme.bodySmall,
         labelText: "검색",
         labelStyle: Theme.of(context).textTheme.bodyLarge,
         suffixIcon: GestureDetector(
             onTap: () {
               Provider.of<Youtubesearchstate>(context, listen: false)
                   .serachYoutube(query: _queryController.text);
+              FocusManager.instance.primaryFocus!.unfocus();
+              _queryController.clear();
             },
             child: Icon(Icons.search, size: 30)),
       ),
@@ -83,22 +92,48 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   // 리스트 뷰
   ListView _searchListView(AsyncSnapshot<dynamic> snapshot) {
     return ListView.builder(
-      itemCount: snapshot.data.length,
+      itemCount: snapshot.data?.length ?? 0,
       itemBuilder: (BuildContext context, int index) {
         Video video = snapshot.data[index];
         return GestureDetector(
+          onTapDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
+          onTapUp: (details) => FocusManager.instance.primaryFocus?.unfocus(),
           onTap: () => showDetailVideo(selectedVideo: video, context: context),
           child: ListTile(
-            title: Text(video.title!),
+            title: Text(video.title!,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge!
+                    .copyWith(fontSize: 16)),
             subtitle: Row(
               children: [
                 Text(video.uploadDate!),
+                SizedBox(width: 5.0),
                 Text(video.views!),
               ],
             ),
-            leading: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Image.network(video.thumbnails!.first.url!),
+            leading: Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: Image.network(video.thumbnails!.first.url!),
+                ),
+                Positioned(
+                  bottom: 3,
+                  right: 3,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 1),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      video.duration.toString().padLeft(2, "00"),
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );

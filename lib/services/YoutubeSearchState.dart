@@ -13,20 +13,22 @@ class Youtubesearchstate extends ChangeNotifier {
   Stream<List<Video>> get searchResult => _streamController.stream;
 
   Future<void> serachYoutube({required String query}) async {
-    List<Video> videoResult = await youtubeAPI.fetchSearchVideo(query);
-    for (var element in videoResult) {
-      Video video = element;
-      print('Video :  $video');
-    }
+    if (query.isNotEmpty) {
+      List<Video> videoResult = await youtubeAPI.fetchSearchVideo(query);
+      for (var element in videoResult) {
+        Video video = element;
+        print('Video :  $video');
+      }
 
-    _streamController.add(videoResult);
-    notifyListeners();
+      _streamController.add(videoResult);
+      notifyListeners();
+    }
   }
 
   @override
   void dispose() {
-    _streamController.close();
     super.dispose();
+    _streamController.close();
   }
 }
 

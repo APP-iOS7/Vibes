@@ -85,7 +85,11 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
 
         // 검색 페이지
-        YoutubeSearchScreen(),
+        YoutubeSearchScreen(
+          streamInjection:
+              Provider.of<Youtubesearchstate>(context, listen: false)
+                  .searchResult,
+        ),
 
         // 검색 페이지
         SettingsScreen(),

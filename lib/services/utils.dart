@@ -25,7 +25,8 @@ void showDetailVideo(
     builder: (context) {
       return Container(
         width: double.infinity,
-        height: double.infinity,
+        height:
+            MediaQuery.of(context).size.height - kToolbarHeight, // 앱바 높이만큼 제외
         color: Theme.of(context).colorScheme.surface,
         child: YoutubeDetailView(detailVideo: selectedVideo),
       );

@@ -741,6 +741,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
+  xml2json:
+    dependency: transitive
+    description:
+      name: xml2json
+      sha256: "9ff65c144a48f7f73d2bd6d919700c7697beced3b51216b982f78c68bc0da142"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.2.6"
   youtube_explode_dart:
     dependency: "direct main"
     description:
@@ -757,6 +765,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.1"
+  youtube_scrape_api:
+    dependency: "direct main"
+    description:
+      name: youtube_scrape_api
+      sha256: "1c02bcd2498c03efddb88dab7a075bbfb92c1991d55451159a5862a4e5443718"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.0"
 sdks:
   dart: ">=3.7.0 <4.0.0"
   flutter: ">=3.24.0"

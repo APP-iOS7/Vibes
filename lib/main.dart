@@ -57,19 +57,9 @@ class _NavigationExampleState extends State<NavigationExample> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
         title:
             Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
-        actions: [
-          IconButton(
-            onPressed:
-                Provider.of<ChangeThemeMode>(context).toggleBrightnessMode,
-            icon: Icon(
-              Provider.of<ChangeThemeMode>(context).themeData == whiteMode()
-                  ? Icons.light_mode_rounded
-                  : Icons.dark_mode_rounded,
-            ),
-          )
-        ],
       ),
       body: <Widget>[
         /// Home page

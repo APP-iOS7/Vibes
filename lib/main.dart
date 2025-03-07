@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ void main() {
       providers: [
         // 확장을 위해 멀티 Provider 사용
         ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
+        ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
       ],
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다

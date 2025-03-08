@@ -26,6 +26,12 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   }
 
   @override
+  void dispose() {
+    _queryController.dispose();
+    super.dispose();
+  }
+  
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(

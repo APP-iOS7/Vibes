@@ -18,6 +18,7 @@ class YoutubeSearchScreen extends StatefulWidget {
 class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   final TextEditingController _queryController = TextEditingController();
   bool _isSearching = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -49,23 +50,30 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
                   return Center(child: Text("문제가 있습니다.. ${snapshot.error}"));
                 } else {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    // stream = null == snapshot.connectionState 입니다
-                    return GestureDetector(
-                      behavior: HitTestBehavior.opaque, // 빈 영역에서도 터치 감지
-                      onTap: () =>
-                          FocusManager.instance.primaryFocus?.unfocus(),
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        height: double.infinity,
-                        child: Text(
-                          "추천 ex) 만두쌤의 코딩 한 코집",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                    if (_isLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    } else {
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque, // 빈 영역에서도 터치 감지
+                        onTap: () =>
+                            FocusManager.instance.primaryFocus?.unfocus(),
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: Text(
+                            "추천 ex) 만두쌤의 코딩 한 코집",
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   } else {
-                    if (_queryController.text.isEmpty && !snapshot.hasData) {}
+                    if (_isSearching && snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (_isSearching && snapshot.data?.length == 0) {
+                      return Center(child: Text("검색 결과가 없습니다."));
+                    }
                     return _searchListView(snapshot);
                   }
                 }
@@ -88,10 +96,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       leading: IconButton(
           icon: Icon(Icons.search),
           onPressed: () {
-            Provider.of<Youtubesearchstate>(context, listen: false)
-                .serachYoutube(query: _queryController.text);
-            FocusManager.instance.primaryFocus!.unfocus();
-            _queryController.clear();
+            _performSearch(_queryController.text);
           }),
       trailing: [
         IconButton(
@@ -105,12 +110,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
         ),
       ],
       onSubmitted: (value) {
-        Provider.of<Youtubesearchstate>(context, listen: false)
-            .serachYoutube(query: value);
-        FocusManager.instance.primaryFocus?.unfocus();
-        setState(() {
-          _isSearching = true;
-        });
+        _performSearch(value);
       },
       padding: const WidgetStatePropertyAll<EdgeInsets>(
         EdgeInsets.symmetric(horizontal: 8.0),
@@ -148,6 +148,18 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
         );
       },
     );
+  }
+
+  void _performSearch(String query) {
+    setState(() {
+      _isSearching = true;
+      _isLoading = true;
+    });
+    
+    Provider.of<Youtubesearchstate>(context, listen: false)
+        .serachYoutube(query: query);
+    
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
 }

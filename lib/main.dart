@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/screen/PlayListScreen.dart';
 import 'package:kls_project/screen/SettingsScreen.dart';
 import 'package:kls_project/screen/YoutubeSearchScreen.dart';
+import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
@@ -15,6 +17,7 @@ void main() {
         // 확장을 위해 멀티 Provider 사용
         ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
         ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
+        ChangeNotifierProvider(create: (_) => PlayListState()),
       ],
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
@@ -74,15 +77,7 @@ class _NavigationExampleState extends State<NavigationExample> {
         ),
 
         // 음악재생 페이지
-        SafeArea(
-          child: Center(
-            child: Text('음악재생',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-          ),
-        ),
+        PlayListScreen(),
 
         // 검색 페이지
         YoutubeSearchScreen(

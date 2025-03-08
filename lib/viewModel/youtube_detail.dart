@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:kls_project/model/VideoModel.dart';
+import 'package:kls_project/services/FileServices.dart';
+import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/services/utils.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtube_scrape_api/models/video.dart';
 
@@ -31,7 +35,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
         showLiveFullscreenButton: false,
         enableCaption: false,
       ),
-    )..setVolume(soundVolume);
+    )..setVolume(50);
   }
 
   @override
@@ -43,6 +47,9 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    print(
+        "volume : ${_youtubePlayerController.value.volume} / sound : $soundVolume");
+
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -70,7 +77,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   Padding _topAppbar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -91,6 +98,9 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
       child: YoutubePlayer(
         controller: _youtubePlayerController,
         showVideoProgressIndicator: true,
+        onEnded: (metaData) {
+          Navigator.of(context).pop();
+        },
         topActions: [], // top 부분 제거를 위함
         bottomActions: [
           // 바텀 부분 커스텀
@@ -143,12 +153,8 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             max: 1.0,
             onChanged: (value) {
               // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
-              _youtubePlayerController.setVolume((value * 100).toInt());
-              setState(() {
-                soundVolume = (value * 100).toInt();
-                print(
-                    "controller volmune : ${_youtubePlayerController.value.volume}");
-              });
+              soundVolume = (value * 100).toInt();
+              _youtubePlayerController.setVolume(soundVolume);
             },
             activeColor: Theme.of(context).sliderTheme.activeTrackColor,
             inactiveColor: Colors.grey,
@@ -188,7 +194,25 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
       child: SizedBox(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () => print(video),
+          onPressed: () {
+            // VideoModel 객체 생성
+            final selectedVideo = VideoModel(
+              videoId: video.videoId,
+              duration: video.duration,
+              title: video.title,
+              channelName: video.channelName,
+              views: video.views,
+              uploadDate: video.uploadDate,
+              thumbnails: video.thumbnails,
+            );
+            // 오디오 다운로드
+            FileServices.instance.downloadVideo(video: selectedVideo);
+            // 뒤로 가기  <- 바텀시트
+            Navigator.of(context).pop();
+
+            Provider.of<PlayListState>(context, listen: false)
+                .createPlayList(selectedVideo);
+          },
           child: Text(
             "다운로드",
             style: Theme.of(context)

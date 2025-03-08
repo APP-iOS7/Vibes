@@ -17,6 +17,8 @@ class YoutubeSearchScreen extends StatefulWidget {
 // initState가 불린다.. 아무것도 없다..?
 class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   final TextEditingController _queryController = TextEditingController();
+  bool _isSearching = false;
+
   @override
   void initState() {
     super.initState();
@@ -30,7 +32,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-            child: _queryTextField(context),
+            child: _buildSearchBar(context),
           ),
           Expanded(
             child: StreamBuilder(
@@ -69,24 +71,59 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
     );
   }
 
-  // 상단 입력 부분
-  TextField _queryTextField(BuildContext context) {
-    return TextField(
+  // 상단 검색바 부분
+  Widget _buildSearchBar(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return SearchBar(
       controller: _queryController,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(),
-        hintText: "듣고 싶은 음악을 선택해주세요",
-        hintStyle: Theme.of(context).textTheme.bodySmall,
-        labelText: "검색",
-        labelStyle: Theme.of(context).textTheme.bodyLarge,
-        suffixIcon: GestureDetector(
-            onTap: () {
-              Provider.of<Youtubesearchstate>(context, listen: false)
-                  .serachYoutube(query: _queryController.text);
-              FocusManager.instance.primaryFocus!.unfocus();
-              _queryController.clear();
-            },
-            child: Icon(Icons.search, size: 30)),
+      hintText: "듣고 싶은 음악을 선택해주세요",
+      hintStyle: WidgetStateProperty.all(Theme.of(context).textTheme.bodySmall),
+      leading: IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            Provider.of<Youtubesearchstate>(context, listen: false)
+                .serachYoutube(query: _queryController.text);
+            FocusManager.instance.primaryFocus!.unfocus();
+            _queryController.clear();
+          }),
+      trailing: [
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            _queryController.clear();
+            setState(() {
+              _isSearching = false;
+            });
+          },
+        ),
+      ],
+      onSubmitted: (value) {
+        Provider.of<Youtubesearchstate>(context, listen: false)
+            .serachYoutube(query: value);
+        FocusManager.instance.primaryFocus?.unfocus();
+        setState(() {
+          _isSearching = true;
+        });
+      },
+      padding: const WidgetStatePropertyAll<EdgeInsets>(
+        EdgeInsets.symmetric(horizontal: 8.0),
+      ),
+      elevation: const WidgetStatePropertyAll<double>(2.0),
+      backgroundColor: WidgetStateProperty.resolveWith<Color>(
+        (states) => Theme.of(context).colorScheme.surface,
+      ),
+      shadowColor: WidgetStateProperty.all(
+        isDarkMode ? Colors.white : Colors.black,
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32.0),
+          side: BorderSide(
+            color: isDarkMode ? Colors.white : Colors.black,
+            width: 1.0,
+          ),
+        ),
       ),
     );
   }
@@ -106,4 +143,5 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       },
     );
   }
+
 }

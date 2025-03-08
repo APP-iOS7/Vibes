@@ -1,6 +1,6 @@
 import 'package:youtube_scrape_api/models/thumbnail.dart';
 
-class Videomodel {
+class VideoModel {
   /// 유튜브의 주소중 쿼리를 날리고 비디오 재생을 하기 위한 비디오 ID (중요)
   final String? videoId;
 
@@ -22,8 +22,11 @@ class Videomodel {
   /// 영상의 썸네일
   final List<Thumbnail>? thumbnails;
 
+  /// audio의 저장 경로를 가지고 있어야 합니다
+  String? audioPath;
+
   // 생성자
-  Videomodel({
+  VideoModel({
     required this.videoId,
     required this.duration,
     required this.title,
@@ -31,5 +34,6 @@ class Videomodel {
     required this.views,
     required this.uploadDate,
     required this.thumbnails,
+    this.audioPath,
   });
 }

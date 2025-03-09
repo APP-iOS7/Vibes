@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/screen/PlayListScreen.dart';
 import 'package:kls_project/screen/SettingsScreen.dart';
 import 'package:kls_project/screen/YoutubeSearchScreen.dart';
@@ -10,7 +13,12 @@ import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(VideoModelAdapter());
+  await Hive.openBox<VideoModel>('playlist');
   runApp(
     MultiProvider(
       providers: [
@@ -37,15 +45,13 @@ class NavigationBarApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: Provider.of<ChangeThemeMode>(context).themeData,
-      home: const NavigationExample(title: 'KLS Music'),
+      home: const NavigationExample(),
     );
   }
 }
 
 class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key, required this.title});
-
-  final String title;
+  const NavigationExample({super.key});
 
   @override
   State<NavigationExample> createState() => _NavigationExampleState();
@@ -53,6 +59,7 @@ class NavigationExample extends StatefulWidget {
 
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
+  String titleName = "KLS MUSIC";
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +68,7 @@ class _NavigationExampleState extends State<NavigationExample> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
-        title:
-            Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+        title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
       ),
       body: <Widget>[
         /// Home page
@@ -94,6 +100,22 @@ class _NavigationExampleState extends State<NavigationExample> {
         onTap: (index) {
           setState(() {
             currentPageIndex = index;
+            if (currentPageIndex > 0) {
+              // 0이 아닌 경우 ex ) KLS MUSIC
+              switch (currentPageIndex) {
+                case 1:
+                  titleName = "플레이 리스트";
+                  break;
+                case 2:
+                  titleName = "검색";
+                  break;
+                case 3:
+                  titleName = "설정";
+                  break;
+              }
+            } else {
+              titleName = "KLS MUSIC";
+            }
           });
         },
         type: BottomNavigationBarType.fixed,

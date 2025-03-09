@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/viewModel/youtube_detail.dart';
-import 'package:youtube_scrape_api/models/video.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as explode;
+import 'package:youtube_scrape_api/models/thumbnail.dart';
+import 'package:youtube_scrape_api/models/video.dart' as scrape;
 
 String formatDuration(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -18,7 +20,7 @@ String formatDuration(Duration duration) {
 
 // 상세한 비디오 영상과 정보를 가져오고 미리 preview 처럼 보여주는 함수
 void showDetailVideo(
-    {required Video selectedVideo, required BuildContext context}) {
+    {required scrape.Video selectedVideo, required BuildContext context}) {
   showModalBottomSheet(
     isScrollControlled: true,
     context: context,
@@ -32,4 +34,9 @@ void showDetailVideo(
       );
     },
   );
+}
+
+// Thumnail 직렬화 함수
+List<String> convertThumnailURL(List<Thumbnail> data) {
+  return data.map((thumnail) => thumnail.url.toString()).toList();
 }

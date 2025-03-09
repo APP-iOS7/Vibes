@@ -17,10 +17,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          Text(
-            "설정",
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
           SizedBox(
             height: 20,
           ),

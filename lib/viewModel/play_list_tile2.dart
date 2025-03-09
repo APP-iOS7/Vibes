@@ -22,7 +22,7 @@ class PlayListTile2 extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: 16 / 9,
-            child: Image.network(video.thumbnails!.first.url!),
+            child: Image.network(video.thumbnailUrls!.first.toString()),
           ),
           Positioned(
             bottom: 3,

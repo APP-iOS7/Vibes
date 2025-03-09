@@ -35,7 +35,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
         showLiveFullscreenButton: false,
         enableCaption: false,
       ),
-    )..setVolume(50);
+    )..setVolume(soundVolume);
   }
 
   @override
@@ -153,8 +153,10 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             max: 1.0,
             onChanged: (value) {
               // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
-              soundVolume = (value * 100).toInt();
-              _youtubePlayerController.setVolume(soundVolume);
+              setState(() {
+                soundVolume = (value * 100).toInt();
+                _youtubePlayerController.setVolume(soundVolume);
+              });
             },
             activeColor: Theme.of(context).sliderTheme.activeTrackColor,
             inactiveColor: Colors.grey,
@@ -203,13 +205,14 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
               channelName: video.channelName,
               views: video.views,
               uploadDate: video.uploadDate,
-              thumbnails: video.thumbnails,
+              thumbnailUrls: convertThumnailURL(video.thumbnails!),
             );
             // 오디오 다운로드
             FileServices.instance.downloadVideo(video: selectedVideo);
             // 뒤로 가기  <- 바텀시트
             Navigator.of(context).pop();
 
+            // playlist 저장
             Provider.of<PlayListState>(context, listen: false)
                 .createPlayList(selectedVideo);
           },

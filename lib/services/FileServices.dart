@@ -15,6 +15,17 @@ class FileServices {
     return _instance;
   }
 
+  // 문서 path getter
+  Future<String> _getDoc() async {
+    final doc = await getApplicationDocumentsDirectory();
+    return doc.path;
+  }
+
+  // 파일경로 getter
+  File _getFile({required String docPath, required String videoId}) {
+    return File('$docPath/$videoId.mp4');
+  }
+
   static FileServices get instance => _instance;
 
   // 파일 다운로드
@@ -26,10 +37,13 @@ class FileServices {
       var manifest = await _yt.videos.streamsClient.getManifest(video.videoId);
       // 모디오 스트림을 가져오는 코드
       var audioStreamInfo = manifest.audioOnly.first;
+      // 문서 생성
+      var dir = await _getDoc();
+
       // 저장할 경로 설정
-      var dir = await getApplicationDocumentsDirectory(); // 저장할 경로 폴더
-      var audioFile = File(
-          '${dir.path}/${video.videoId}.mp4'); // audioFile은 또한 저장할 파일을 미리 정의 선언?
+      var audioFile = _getFile(
+          docPath: dir,
+          videoId: video.videoId!); // audioFile은 또한 저장할 파일을 미리 정의 선언?
       // 출력 테스트
       print(dir);
 
@@ -124,5 +138,14 @@ class FileServices {
     } else {
       print('파일이 존재하지 않습니다.');
     }
+  }
+
+  // 제거 함수
+  Future<void> deleteVideo({required String videoId}) async {
+    // 내부 파일 경로 가져오기
+    var docPath = await _getDoc();
+    File file = _getFile(docPath: docPath, videoId: videoId);
+
+    file.delete();
   }
 }

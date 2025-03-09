@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kls_project/model/VideoModel.dart';
+import 'package:kls_project/services/FileServices.dart';
 import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/viewModel/play_list_tile2.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +29,24 @@ class PlayListScreen extends StatelessWidget {
             itemCount: playListState.playlist.length,
             itemBuilder: (context, index) {
               VideoModel music = playListState.playlist[index];
-              return PlayListTile2(video: music);
+              print(music.videoId);
+              return Slidable(
+                endActionPane: ActionPane(
+                  extentRatio: 0.25,
+                  motion: ScrollMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (BuildContext context) =>
+                          playListState.deletePlayList(music.videoId!),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      icon: Icons.delete_forever,
+                      label: 'delete',
+                    ),
+                  ],
+                ),
+                child: PlayListTile2(video: music),
+              );
             },
           );
         },

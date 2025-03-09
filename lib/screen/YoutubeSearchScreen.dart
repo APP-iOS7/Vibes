@@ -31,7 +31,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
     _queryController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -69,7 +69,8 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
                       );
                     }
                   } else {
-                    if (_isSearching && snapshot.connectionState == ConnectionState.waiting) {
+                    if (_isSearching &&
+                        snapshot.connectionState == ConnectionState.waiting) {
                       return Center(child: CircularProgressIndicator());
                     } else if (_isSearching && snapshot.data?.length == 0) {
                       return Center(child: Text("검색 결과가 없습니다."));
@@ -151,15 +152,18 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   }
 
   void _performSearch(String query) {
+    if (query.isEmpty) {
+      return;
+    }
+
     setState(() {
       _isSearching = true;
       _isLoading = true;
     });
-    
+
     Provider.of<Youtubesearchstate>(context, listen: false)
         .serachYoutube(query: query);
-    
+
     FocusManager.instance.primaryFocus?.unfocus();
   }
-
 }

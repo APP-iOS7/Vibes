@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
 import 'package:kls_project/model/VideoModel.dart';
+import 'package:kls_project/screen/HomeScreen.dart';
 import 'package:kls_project/screen/PlayListScreen.dart';
 import 'package:kls_project/screen/SettingsScreen.dart';
 import 'package:kls_project/screen/YoutubeSearchScreen.dart';
@@ -51,7 +52,8 @@ class NavigationBarApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'KSL MUSIC',
+      debugShowCheckedModeBanner: false,
       theme: Provider.of<ChangeThemeMode>(context).themeData,
       home: const NavigationExample(),
     );
@@ -77,6 +79,7 @@ class _NavigationExampleState extends State<NavigationExample> {
 
   @override
   Widget build(BuildContext context) {
+    print(currentPageIndex);
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -85,15 +88,12 @@ class _NavigationExampleState extends State<NavigationExample> {
         title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
       ),
       body: <Widget>[
-        /// Home page
-        SafeArea(
-          child: Center(
-            child: Text('홈',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black)),
-          ),
+        /// 홈 스크린
+        HomeScreen(
+          onChange: () {
+            currentPageIndex = 2;
+            setState(() {});
+          },
         ),
 
         // 음악재생 페이지

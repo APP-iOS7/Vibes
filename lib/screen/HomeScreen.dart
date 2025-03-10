@@ -15,9 +15,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Column(
         children: [
-          AspectRatio(
+          Container(
+            padding: EdgeInsets.all(50),
+            child: AspectRatio(
               aspectRatio: 1,
-              child: Image.asset("assets/images/splash_logo.png")),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20), // 모서리 둥글게 (20px)
+                child: Image.asset("assets/images/splash_logo.png"),
+              ),
+            ),
+          ),
           Text(
             "KLS MUSIC에 오신걸 환영합니다",
             style: Theme.of(context).textTheme.titleLarge,

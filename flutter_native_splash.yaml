@@ -1,0 +1,15 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+
+  background_image: "assets/images/background.png"
+  image: "assets/images/splash_logo.png"
+
+  # 다크 모드 설정
+  background_image_dark: "assets/images/background_dark.png"
+  # image_dark를 따로 지정하지 않으면 기본 image를 사용합니다
+
+  android_12:
+    color: "#ffffff"
+    image: "assets/images/splash_logo.png"

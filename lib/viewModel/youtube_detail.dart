@@ -87,7 +87,6 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             "KLS PREVIEW",
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          Icon(Icons.menu, size: 25)
         ],
       ),
     );

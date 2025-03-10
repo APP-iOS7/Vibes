@@ -7,11 +7,19 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/utils.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:kls_project/viewModel/play_list_tile2.dart';
 
 // 오디오를 자세하게 보여주며 실행하는 스크린 입니다.
 class AudioPlayScreen extends StatefulWidget {
   final VideoModel videoModel;
-  const AudioPlayScreen({required this.videoModel, super.key});
+  final List<VideoModel>? playlist; // 플레이리스트 추가 (선택적)
+  final int initialIndex; // 초기 인덱스 추가
+
+  const AudioPlayScreen(
+      {required this.videoModel,
+      this.playlist,
+      this.initialIndex = 0,
+      super.key});
 
   @override
   State<AudioPlayScreen> createState() => _AudioPlayScreenState();
@@ -58,12 +66,25 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   // 현재 위치를 추적하기 위한 변수
   Duration _currentPosition = Duration.zero;
 
+  // 플레이리스트 관련 변수
+  late List<VideoModel> _playlist;
+  late int _currentIndex;
+
   @override
   void initState() {
     super.initState();
+    // 플레이리스트 초기화
+    if (widget.playlist != null && widget.playlist!.isNotEmpty) {
+      _playlist = widget.playlist!;
+      _currentIndex = widget.initialIndex;
+    } else {
+      // 플레이리스트가 없으면 현재 곡만 포함
+      _playlist = [widget.videoModel];
+      _currentIndex = 0;
+    }
     // 오디오 플레이어 초기화
     audioPlayer.setLoopMode(LoopMode.off);
-    playSoundinFile(audioPlayer: audioPlayer, video: widget.videoModel);
+    playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
 
     // 위치 스트림 리스너 설정
     audioPlayer.positionStream.listen((position) {
@@ -95,6 +116,9 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 현재 재생 중인 비디오 모델 가져오기
+    final currentVideo = _playlist[_currentIndex];
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -103,11 +127,11 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
           child: Column(
             children: [
               _topAppBarTitle(context),
-              Expanded(child: _thumnailContent()),
-              _mainTitle(context),
+              Expanded(child: _thumnailContent(currentVideo)), // 현재 비디오 전달
+              _mainTitle(context, currentVideo), // 현재 비디오 전달
               SizedBox(height: 8),
-              _channelNameView(context),
-              _audioSlider(context),
+              _channelNameView(context, currentVideo), // 현재 비디오 전달
+              _audioSlider(context, currentVideo), // 현재 비디오 전달
               _playAudioBox(context)
             ],
           ),
@@ -137,8 +161,8 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     );
   }
 
-  // 썸네일 이미지 부분
-  Container _thumnailContent() {
+  // 썸네일 이미지 부분 (현재 비디오 사용)
+  Container _thumnailContent(VideoModel video) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       margin: EdgeInsets.symmetric(vertical: 12),
@@ -148,30 +172,30 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Image.network(
-          widget.videoModel.thumbnailUrls!.first.toString(),
+          video.thumbnailUrls!.first.toString(),
           fit: BoxFit.contain,
         ),
       ),
     );
   }
 
-  // 메인 텍스트 뷰
-  Text _mainTitle(BuildContext context) {
+  // 메인 텍스트 뷰 (현재 비디오 사용)
+  Text _mainTitle(BuildContext context, VideoModel video) {
     return Text(
-      widget.videoModel.title.toString(),
+      video.title.toString(),
       style: Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16),
     );
   }
 
-  // 채널 이름
-  Row _channelNameView(BuildContext context) {
+  // 채널 이름 (현재 비디오 사용)
+  Row _channelNameView(BuildContext context, VideoModel video) {
     return Row(
       children: [
         Expanded(child: Divider()),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Text(
-            widget.videoModel.channelName!,
+            video.channelName!,
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!
@@ -183,8 +207,8 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     );
   }
 
-  // audio duration Slider 뷰 입니다.
-  SliderTheme _audioSlider(BuildContext context) {
+  // audio duration Slider 뷰 (현재 비디오 사용)
+  SliderTheme _audioSlider(BuildContext context, VideoModel video) {
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: Theme.of(context).colorScheme.primary, // 진행된 트랙 색상
@@ -207,8 +231,8 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                   Expanded(
                     child: ProgressBar(
                       progress: snapshot.data!,
-                      buffered: parseDuration(widget.videoModel.duration!),
-                      total: parseDuration(widget.videoModel.duration!),
+                      buffered: parseDuration(video.duration!),
+                      total: parseDuration(video.duration!),
                       timeLabelLocation: TimeLabelLocation.sides,
                       onSeek: (duration) {
                         audioPlayer.seek(duration);
@@ -222,6 +246,44 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
         },
       ),
     );
+  }
+
+  // 이전 곡이 있는지 확인하는 메서드
+  bool hasPreviousSong() {
+    return _currentIndex > 0;
+  }
+
+  // 이전 곡 재생 메서드
+  void playPreviousSong() {
+    if (hasPreviousSong()) {
+      setState(() {
+        _currentIndex--;
+      });
+
+      // 이전 곡 재생
+      playSoundinFile(
+          audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+      _updateCurrentSong();
+    }
+  }
+
+  // 다음 곡이 있는지 확인하는 메서드
+  bool hasNextSong() {
+    return _currentIndex < _playlist.length - 1;
+  }
+
+  // 다음 곡 재생 메서드
+  void playNextSong() {
+    if (hasNextSong()) {
+      setState(() {
+        _currentIndex++;
+      });
+
+      // 다음 곡 재생
+      playSoundinFile(
+          audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+      _updateCurrentSong();
+    }
   }
 
   // audio 관련 기능 View
@@ -278,9 +340,42 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
               ],
             ),
           ),
-          CircleAvatar(
-            backgroundColor: Colors.redAccent,
-            child: Icon(Icons.skip_previous),
+          GestureDetector(
+            onTap: () {
+              // 현재 재생 위치 확인
+              if (_currentPosition.inSeconds <= 3) {
+                // 3초 이내라면 이전 곡으로 이동
+                if (hasPreviousSong()) {
+                  playPreviousSong();
+                } else {
+                  // 이전 곡이 없으면 메시지 표시
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('이전 곡이 없습니다.'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } else {
+                // 3초 이상이라면 현재 곡의 처음부터 재생
+                setState(() {
+                  _currentPosition = Duration.zero;
+                });
+                audioPlayer.seek(Duration.zero).then((_) {
+                  // 재생 중이 아니라면 재생 시작
+                  if (!isPlaying) {
+                    setState(() {
+                      isPlaying = true;
+                    });
+                    audioPlayer.play();
+                  }
+                });
+              }
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.redAccent,
+              child: Icon(Icons.skip_previous),
+            ),
           ),
           GestureDetector(
             onTap: () {
@@ -298,9 +393,25 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
               child: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
             ),
           ),
-          CircleAvatar(
-            backgroundColor: Colors.redAccent,
-            child: Icon(Icons.skip_next),
+          GestureDetector(
+            onTap: () {
+              // 다음 곡 재생
+              if (hasNextSong()) {
+                playNextSong();
+              } else {
+                // 다음 곡이 없으면 메시지 표시
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('다음 곡이 없습니다.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.redAccent,
+              child: Icon(Icons.skip_next),
+            ),
           ),
           GestureDetector(
             onTap: () {},
@@ -309,5 +420,15 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
         ],
       ),
     );
+  }
+
+  // 현재 재생 중인 곡 정보 업데이트
+  void _updateCurrentSong() {
+    setState(() {
+      // UI 업데이트를 위한 상태 갱신
+      _currentPosition = Duration.zero;
+    });
+
+    // 제목과 썸네일 등이 업데이트되도록 build 메서드가 다시 호출됨
   }
 }

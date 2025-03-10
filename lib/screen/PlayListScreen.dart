@@ -29,6 +29,9 @@ class PlayListScreen extends StatelessWidget {
             itemCount: playListState.playlist.length,
             itemBuilder: (context, index) {
               VideoModel music = playListState.playlist[index];
+              // 플레이리스트 데이터는 PlayListState에서 가져옴
+              List<VideoModel> allVideos = playListState.playlist;
+
               return Slidable(
                 endActionPane: ActionPane(
                   extentRatio: 0.25,
@@ -44,7 +47,12 @@ class PlayListScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: PlayListTile2(video: music),
+                // child: PlayListTile2(video: music),
+                child: PlayListTile2(
+                  video: music,
+                  allVideos: allVideos, // 전체 플레이리스트 전달
+                  currentIndex: index, // 현재 인덱스 전달
+                ),
               );
             },
           );

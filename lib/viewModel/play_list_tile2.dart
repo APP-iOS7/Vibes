@@ -1,15 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/utils.dart';
+import 'package:kls_project/viewModel/audio_play_screen.dart';
 
 class PlayListTile2 extends StatelessWidget {
   final VideoModel video;
-  const PlayListTile2({required this.video, super.key});
+  final List<VideoModel> allVideos;
+  final int currentIndex;
+
+  const PlayListTile2(
+      {required this.video,
+      required this.allVideos,
+      required this.currentIndex,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () => showDetailAudio(selectedVideo: video, context: context),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AudioPlayScreen(
+              videoModel: video,
+              playlist: allVideos,
+              initialIndex: currentIndex,
+            ),
+          ),
+        );
+      },
       title: Text(video.title!,
           style:
               Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),

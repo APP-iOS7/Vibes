@@ -14,13 +14,12 @@ class AudioPlayScreen extends StatefulWidget {
   final VideoModel videoModel;
   final List<VideoModel>? playlist; // 플레이리스트 추가 (선택적)
   final int initialIndex; // 초기 인덱스 추가
-  
-  const AudioPlayScreen({
-    required this.videoModel, 
-    this.playlist, 
-    this.initialIndex = 0, 
-    super.key
-  });
+
+  const AudioPlayScreen(
+      {required this.videoModel,
+      this.playlist,
+      this.initialIndex = 0,
+      super.key});
 
   @override
   State<AudioPlayScreen> createState() => _AudioPlayScreenState();
@@ -67,27 +66,26 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   bool isShuffling = false; // 셔플 모드 상태 추가
   // 현재 위치를 추적하기 위한 변수
   Duration _currentPosition = Duration.zero;
-  
+
   // 플레이리스트 관련 변수
   late List<VideoModel> _playlist;
   late List<VideoModel> _originalPlaylist; // 원본 플레이리스트 저장
   late int _currentIndex;
-  
+
   @override
   void initState() {
     super.initState();
     // 플레이리스트 초기화
     if (widget.playlist != null && widget.playlist!.isNotEmpty) {
-      _playlist = List.from(widget.playlist!); // 복사본 생성
-      _originalPlaylist = List.from(widget.playlist!); // 원본 저장
+      _playlist = List.from(widget.playlist!);
+      _originalPlaylist = List.from(widget.playlist!);
       _currentIndex = widget.initialIndex;
     } else {
-      // 플레이리스트가 없으면 현재 곡만 포함
       _playlist = [widget.videoModel];
       _originalPlaylist = [widget.videoModel];
       _currentIndex = 0;
     }
-    
+
     // 오디오 플레이어 초기화
     audioPlayer.setLoopMode(LoopMode.off);
     playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
@@ -97,18 +95,46 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       setState(() {
         _currentPosition = position;
       });
+
+      // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
+      final totalDuration = parseDuration(_playlist[_currentIndex].duration!);
+      if (position.inMilliseconds >= totalDuration.inMilliseconds * 0.99) {
+        // 곡의 끝에 가까운 위치이고, 반복 모드가 켜져 있다면
+        if (isLooping) {
+          print("곡의 끝에 도달하고 반복 모드가 켜져 있어 처음으로 돌아갑니다.");
+
+          setState(() {
+            // ProgressBar 초기화를 위해 _currentPosition 설정
+            _currentPosition = Duration.zero;
+          });
+
+          // 오디오 플레이어 위치 초기화 및 재생
+          audioPlayer.seek(Duration.zero).then((_) {
+            audioPlayer.play();
+          });
+        }
+      }
     });
 
     // 플레이어 상태 스트림 리스너 설정
     audioPlayer.playerStateStream.listen((playerState) {
       if (playerState.processingState == ProcessingState.completed) {
+        print("재생이 완료되었습니다.");
+
         if (isLooping) {
+          print("반복 모드가 켜져 있어 처음부터 다시 재생합니다.");
+
           // 반복 재생 시 처음부터 다시 재생
           setState(() {
             _currentPosition = Duration.zero;
           });
-          audioPlayer.seek(Duration.zero);
-          audioPlayer.play();
+
+          // 약간의 지연 후 오디오 재생 (UI 업데이트 후)
+          Future.delayed(Duration(milliseconds: 50), () {
+            audioPlayer.seek(Duration.zero).then((_) {
+              audioPlayer.play();
+            });
+          });
         }
       }
     });
@@ -124,7 +150,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   Widget build(BuildContext context) {
     // 현재 재생 중인 비디오 모델 가져오기
     final currentVideo = _playlist[_currentIndex];
-    
+
     return Scaffold(
       body: SafeArea(
         child: Container(
@@ -240,7 +266,31 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                       total: parseDuration(video.duration!),
                       timeLabelLocation: TimeLabelLocation.sides,
                       onSeek: (duration) {
+                        // 사용자가 직접 탐색한 경우 해당 위치로 이동
                         audioPlayer.seek(duration);
+
+                        // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
+                        final totalDuration = parseDuration(video.duration!);
+                        if (duration.inMilliseconds >=
+                            totalDuration.inMilliseconds * 0.99) {
+                          // 곡의 끝에 가까운 위치로 탐색했고, 반복 모드가 켜져 있다면
+                          if (isLooping) {
+                            print("곡의 끝에 도달하고 반복 모드가 켜져 있어 처음으로 돌아갑니다.");
+
+                            // 약간의 지연 후 처음으로 돌아가기 (UI 업데이트를 위해)
+                            Future.delayed(Duration(milliseconds: 50), () {
+                              setState(() {
+                                // ProgressBar 초기화를 위해 _currentPosition 설정
+                                _currentPosition = Duration.zero;
+                              });
+
+                              // 오디오 플레이어 위치 초기화 및 재생
+                              audioPlayer.seek(Duration.zero).then((_) {
+                                audioPlayer.play();
+                              });
+                            });
+                          }
+                        }
                       },
                     ),
                   ),
@@ -257,34 +307,36 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   bool hasPreviousSong() {
     return _currentIndex > 0;
   }
-  
+
   // 이전 곡 재생 메서드
   void playPreviousSong() {
     if (hasPreviousSong()) {
       setState(() {
         _currentIndex--;
       });
-      
+
       // 이전 곡 재생
-      playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+      playSoundinFile(
+          audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
       _updateCurrentSong();
     }
   }
-  
+
   // 다음 곡이 있는지 확인하는 메서드
   bool hasNextSong() {
     return _currentIndex < _playlist.length - 1;
   }
-  
+
   // 다음 곡 재생 메서드
   void playNextSong() {
     if (hasNextSong()) {
       setState(() {
         _currentIndex++;
       });
-      
+
       // 다음 곡 재생
-      playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+      playSoundinFile(
+          audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
       _updateCurrentSong();
     }
   }
@@ -293,19 +345,19 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   void toggleShuffle() {
     setState(() {
       isShuffling = !isShuffling;
-      
+
       if (isShuffling) {
         // 현재 곡 저장
         VideoModel currentSong = _playlist[_currentIndex];
-        
+
         // 플레이리스트 섞기
         _playlist = List.from(_playlist)..shuffle();
-        
+
         // 현재 곡을 첫 번째로 이동
         _playlist.remove(currentSong);
         _playlist.insert(0, currentSong);
         _currentIndex = 0;
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('셔플 모드가 켜졌습니다.'),
@@ -315,13 +367,13 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       } else {
         // 현재 곡 저장
         VideoModel currentSong = _playlist[_currentIndex];
-        
+
         // 원래 순서로 복원
         _playlist = List.from(_originalPlaylist);
-        
+
         // 현재 인덱스 업데이트
         _currentIndex = _playlist.indexOf(currentSong);
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('셔플 모드가 꺼졌습니다.'),
@@ -465,7 +517,9 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
             },
             child: Icon(
               Icons.shuffle,
-              color: isShuffling ? Colors.white : Colors.white70, // 셔플 상태에 따라 색상 변경
+              color: isShuffling
+                  ? Colors.white
+                  : Colors.white70, // 셔플 상태에 따라 색상 변경
             ),
           ),
         ],
@@ -479,7 +533,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       // UI 업데이트를 위한 상태 갱신
       _currentPosition = Duration.zero;
     });
-    
+
     // 제목과 썸네일 등이 업데이트되도록 build 메서드가 다시 호출됨
   }
 }

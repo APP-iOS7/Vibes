@@ -144,7 +144,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
             style: Theme.of(context)
                 .textTheme
                 .bodySmall!
-                .copyWith(color: Colors.white),
+                .copyWith(color: Theme.of(context).colorScheme.secondary),
           ),
         ),
         Expanded(child: Divider()),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DopeScreen extends StatefulWidget {
+  DopeScreen(void Function() goToNextPage);
+
   @override
   State<DopeScreen> createState() => _DopeScreenState();
 }
@@ -57,7 +59,7 @@ class _DopeScreenState extends State<DopeScreen> {
           // 세 번째 페이지 (예시)
           Center(
             child: Text(
-              "세 번째 페이지 내용",
+              "여기가 마지막입니다.",
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/VideoModel.dart';
+import 'package:kls_project/services/utils.dart';
 
 class PlayListTile2 extends StatelessWidget {
   final VideoModel video;
@@ -8,6 +9,7 @@ class PlayListTile2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () => showDetailAudio(selectedVideo: video, context: context),
       title: Text(video.title!,
           style:
               Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),

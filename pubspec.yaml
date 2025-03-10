@@ -24,6 +24,7 @@ dependencies:
   flutter_slidable: ^4.0.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  audio_video_progress_bar: ^2.0.3
 
 dev_dependencies:
   flutter_test:

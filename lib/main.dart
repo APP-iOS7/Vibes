@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:kls_project/model/ChangeThemeMode.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/screen/PlayListScreen.dart';
@@ -19,6 +20,11 @@ void main() async {
 
   Hive.registerAdapter(VideoModelAdapter());
   await Hive.openBox<VideoModel>('playlist');
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(
     MultiProvider(
       providers: [

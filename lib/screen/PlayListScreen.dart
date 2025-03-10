@@ -29,7 +29,6 @@ class PlayListScreen extends StatelessWidget {
             itemCount: playListState.playlist.length,
             itemBuilder: (context, index) {
               VideoModel music = playListState.playlist[index];
-              print(music.videoId);
               return Slidable(
                 endActionPane: ActionPane(
                   extentRatio: 0.25,

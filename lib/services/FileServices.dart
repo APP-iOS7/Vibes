@@ -18,6 +18,7 @@ class FileServices {
   // 문서 path getter
   Future<String> _getDoc() async {
     final doc = await getApplicationDocumentsDirectory();
+    print(doc);
     return doc.path;
   }
 

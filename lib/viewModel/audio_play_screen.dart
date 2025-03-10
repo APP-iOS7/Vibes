@@ -113,6 +113,30 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
           audioPlayer.seek(Duration.zero).then((_) {
             audioPlayer.play();
           });
+        } 
+        // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
+        else if (!isLooping && hasNextSong()) {
+          print("positionStream: 곡의 끝에 도달하고 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
+          
+          // 현재 오디오 플레이어 정지
+          audioPlayer.stop();
+          
+          // 다음 곡으로 이동
+          setState(() {
+            _currentIndex++;
+            _currentPosition = Duration.zero; // 위치 초기화
+          });
+          
+          // 즉시 다음 곡 재생 시작
+          playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+          
+          // 사용자에게 알림
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('다음 곡을 재생합니다: ${_playlist[_currentIndex].title}'),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
       }
     });
@@ -131,6 +155,41 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
               audioPlayer.play();
             });
           });
+        } 
+        // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
+        else if (!isLooping && hasNextSong()) {
+          print("playerStateStream: 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
+          
+          // 현재 오디오 플레이어 정지
+          audioPlayer.stop();
+          
+          // 다음 곡으로 이동
+          setState(() {
+            _currentIndex++;
+            _currentPosition = Duration.zero; // 위치 초기화
+          });
+          
+          // 즉시 다음 곡 재생 시작
+          playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+          
+          // 사용자에게 알림
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('다음 곡을 재생합니다: ${_playlist[_currentIndex].title}'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          // 다음 곡이 없는 경우 (플레이리스트의 마지막 곡)
+          print("playerStateStream: 플레이리스트의 마지막 곡이 끝났습니다.");
+          
+          // 사용자에게 알림
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('플레이리스트의 마지막 곡입니다.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
         }
       }
     });
@@ -285,6 +344,33 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                                 audioPlayer.play();
                               });
                             });
+                          }
+                          // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
+                          else if (!isLooping && hasNextSong()) {
+                            print("곡의 끝에 도달하고 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
+
+                            // 현재 오디오 플레이어 정지
+                            audioPlayer.stop();
+
+                            // 다음 곡으로 이동
+                            setState(() {
+                              _currentIndex++;
+                              _currentPosition = Duration.zero; // 위치 초기화
+                            });
+
+                            // 즉시 다음 곡 재생 시작
+                            playSoundinFile(
+                                audioPlayer: audioPlayer,
+                                video: _playlist[_currentIndex]);
+
+                            // 사용자에게 알림
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    '다음 곡을 재생합니다: ${_playlist[_currentIndex].title}'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
                           }
                         }
                       },

@@ -64,11 +64,13 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   final AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = true;
   bool isLooping = false;
+  bool isShuffling = false; // 셔플 모드 상태 추가
   // 현재 위치를 추적하기 위한 변수
   Duration _currentPosition = Duration.zero;
   
   // 플레이리스트 관련 변수
   late List<VideoModel> _playlist;
+  late List<VideoModel> _originalPlaylist; // 원본 플레이리스트 저장
   late int _currentIndex;
   
   @override
@@ -76,11 +78,13 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     super.initState();
     // 플레이리스트 초기화
     if (widget.playlist != null && widget.playlist!.isNotEmpty) {
-      _playlist = widget.playlist!;
+      _playlist = List.from(widget.playlist!); // 복사본 생성
+      _originalPlaylist = List.from(widget.playlist!); // 원본 저장
       _currentIndex = widget.initialIndex;
     } else {
       // 플레이리스트가 없으면 현재 곡만 포함
       _playlist = [widget.videoModel];
+      _originalPlaylist = [widget.videoModel];
       _currentIndex = 0;
     }
     
@@ -285,6 +289,49 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     }
   }
 
+  // 플레이리스트 셔플 메서드
+  void toggleShuffle() {
+    setState(() {
+      isShuffling = !isShuffling;
+      
+      if (isShuffling) {
+        // 현재 곡 저장
+        VideoModel currentSong = _playlist[_currentIndex];
+        
+        // 플레이리스트 섞기
+        _playlist = List.from(_playlist)..shuffle();
+        
+        // 현재 곡을 첫 번째로 이동
+        _playlist.remove(currentSong);
+        _playlist.insert(0, currentSong);
+        _currentIndex = 0;
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('셔플 모드가 켜졌습니다.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        // 현재 곡 저장
+        VideoModel currentSong = _playlist[_currentIndex];
+        
+        // 원래 순서로 복원
+        _playlist = List.from(_originalPlaylist);
+        
+        // 현재 인덱스 업데이트
+        _currentIndex = _playlist.indexOf(currentSong);
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('셔플 모드가 꺼졌습니다.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    });
+  }
+
   // audio 관련 기능 View
   Container _playAudioBox(BuildContext context) {
     return Container(
@@ -413,8 +460,13 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () {},
-            child: Icon(Icons.shuffle),
+            onTap: () {
+              toggleShuffle(); // 셔플 토글 메서드 호출
+            },
+            child: Icon(
+              Icons.shuffle,
+              color: isShuffling ? Colors.white : Colors.white70, // 셔플 상태에 따라 색상 변경
+            ),
           ),
         ],
       ),

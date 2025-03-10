@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/FileServices.dart';
+import 'package:kls_project/services/GlobalSnackBar.dart';
 import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/services/utils.dart';
 import 'package:provider/provider.dart';
@@ -230,10 +231,25 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
                 );
                 Navigator.of(context).pop();
               } else {
-                // 오디오 다운로드
-                FileServices.instance.downloadVideo(video: selectedVideo);
+                // 다운로드 시작 알림
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('다운로드를 시작합니다...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+
                 // 뒤로 가기  <- 바텀시트
                 Navigator.of(context).pop();
+
+                // 오디오 다운로드
+                FileServices.instance
+                    .downloadVideo(video: selectedVideo)
+                    .then((_) {
+                  GlobalSnackBar.show('다운로드가 완료되었습니다!', isSuccess: true);
+                }).catchError((error) {
+                  GlobalSnackBar.show('다운로드 중 오류가 발생했습니다.', isSuccess: false);
+                });
 
                 // playlist 저장
                 Provider.of<PlayListState>(context, listen: false)

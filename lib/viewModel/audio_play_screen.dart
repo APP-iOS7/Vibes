@@ -54,11 +54,37 @@ Future<void> playSoundinFile(
 class _AudioPlayScreenState extends State<AudioPlayScreen> {
   final AudioPlayer audioPlayer = AudioPlayer();
   bool isPlaying = true;
+  bool isLooping = false;
+  // 현재 위치를 추적하기 위한 변수
+  Duration _currentPosition = Duration.zero;
 
   @override
   void initState() {
     super.initState();
+    // 오디오 플레이어 초기화
+    audioPlayer.setLoopMode(LoopMode.off);
     playSoundinFile(audioPlayer: audioPlayer, video: widget.videoModel);
+
+    // 위치 스트림 리스너 설정
+    audioPlayer.positionStream.listen((position) {
+      setState(() {
+        _currentPosition = position;
+      });
+    });
+
+    // 플레이어 상태 스트림 리스너 설정
+    audioPlayer.playerStateStream.listen((playerState) {
+      if (playerState.processingState == ProcessingState.completed) {
+        if (isLooping) {
+          // 반복 재생 시 처음부터 다시 재생
+          setState(() {
+            _currentPosition = Duration.zero;
+          });
+          audioPlayer.seek(Duration.zero);
+          audioPlayer.play();
+        }
+      }
+    });
   }
 
   @override
@@ -69,18 +95,22 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: kToolbarHeight, horizontal: 10),
-      child: Column(
-        children: [
-          _topAppBarTitle(context),
-          Expanded(child: _thumnailContent()),
-          _mainTitle(context),
-          SizedBox(height: 8),
-          _channelNameView(context),
-          _audioSlider(context),
-          _playAudioBox(context)
-        ],
+    return Scaffold(
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          child: Column(
+            children: [
+              _topAppBarTitle(context),
+              Expanded(child: _thumnailContent()),
+              _mainTitle(context),
+              SizedBox(height: 8),
+              _channelNameView(context),
+              _audioSlider(context),
+              _playAudioBox(context)
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -205,7 +235,48 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Icon(Icons.loop),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                // 반복 모드 전환
+                isLooping = !isLooping;
+                if (isLooping) {
+                  audioPlayer.setLoopMode(LoopMode.one).then((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('반복 재생이 켜졌습니다.'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  });
+                } else {
+                  audioPlayer.setLoopMode(LoopMode.off).then((_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('반복 재생이 꺼졌습니다.'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  });
+                }
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(isLooping ? Icons.repeat_one : Icons.repeat,
+                    color: isLooping ? Colors.white : Colors.white70),
+                if (!isLooping)
+                  Transform.rotate(
+                      angle: -0.785,
+                      child: Container(
+                        width: 24,
+                        height: 2,
+                        color: Colors.white60,
+                      ))
+              ],
+            ),
+          ),
           CircleAvatar(
             backgroundColor: Colors.redAccent,
             child: Icon(Icons.skip_previous),

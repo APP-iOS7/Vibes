@@ -9,6 +9,7 @@ import 'package:kls_project/screen/HomeScreen.dart';
 import 'package:kls_project/screen/PlayListScreen.dart';
 import 'package:kls_project/screen/SettingsScreen.dart';
 import 'package:kls_project/screen/YoutubeSearchScreen.dart';
+import 'package:kls_project/screen/dopeScreen.dart';
 import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
@@ -23,6 +24,15 @@ void main() async {
 
   Hive.registerAdapter(VideoModelAdapter());
   await Hive.openBox<VideoModel>('playlist');
+  var tutorialBox = await Hive.openBox<bool>('isTutorial');
+  // 앱을 처음 실행하면 true 아니면 false
+  bool isFirstRun = tutorialBox.get('isTutorial', defaultValue: false) == false;
+
+  // 다음 실행때는 나오지 않도록 값을 넣어줍니다.
+  if (isFirstRun) {
+    await tutorialBox.put('isTutorial', true);
+  }
+  // 백그라운드 재생을 위한 초기화
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
     androidNotificationChannelName: 'Audio playback',
@@ -39,15 +49,32 @@ void main() async {
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
         child: Consumer<ChangeThemeMode>(
-          builder: (context, changeMode, child) => const NavigationBarApp(),
+          builder: (context, changeMode, child) => PageRouteSelection(
+            isFirstRun: isFirstRun, // isFirstRun을 전달 해줍니다.
+          ),
         ),
       ),
     ),
   );
 }
 
-class NavigationBarApp extends StatelessWidget {
-  const NavigationBarApp({super.key});
+class PageRouteSelection extends StatefulWidget {
+  final bool isFirstRun;
+  const PageRouteSelection({required this.isFirstRun, super.key});
+
+  @override
+  State<PageRouteSelection> createState() => _NavigationBarAppState();
+}
+
+class _NavigationBarAppState extends State<PageRouteSelection> {
+  bool isFirstRun = false; // 부모에게 받기 위한 상태변수
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove(); // 한곳에서 SplashScreen을 닫게 합니다.
+    isFirstRun = widget.isFirstRun;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,32 +82,32 @@ class NavigationBarApp extends StatelessWidget {
       title: 'KSL MUSIC',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ChangeThemeMode>(context).themeData,
-      home: const NavigationExample(),
+      home: isFirstRun
+          ? DopeScreen(
+              nextMainPage: () {
+                setState(() {
+                  isFirstRun = !isFirstRun;
+                });
+              },
+            )
+          : MainScreen(),
     );
   }
 }
 
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<NavigationExample> createState() => _NavigationExampleState();
+  State<MainScreen> createState() => _NavigationExampleState();
 }
 
-class _NavigationExampleState extends State<NavigationExample> {
+class _NavigationExampleState extends State<MainScreen> {
   int currentPageIndex = 0;
   String titleName = "KLS MUSIC";
 
   @override
-  void initState() {
-    super.initState();
-    FlutterNativeSplash.remove();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print(currentPageIndex);
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,

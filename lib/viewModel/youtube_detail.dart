@@ -78,14 +78,25 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   Padding _topAppbar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(); // 현재 화면 닫기
+            },
+            child: Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+          ),
           Text(
             "KLS PREVIEW",
             style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(); // 현재 화면 닫기
+            },
+            child: Icon(Icons.close_rounded, size: 25),
           ),
         ],
       ),

@@ -15,11 +15,12 @@ class AudioPlayScreen extends StatefulWidget {
   final List<VideoModel>? playlist; // 플레이리스트 추가 (선택적)
   final int initialIndex; // 초기 인덱스 추가
 
-  const AudioPlayScreen(
-      {required this.videoModel,
-      this.playlist,
-      this.initialIndex = 0,
-      super.key});
+  const AudioPlayScreen({
+    required this.videoModel,
+    this.playlist,
+    this.initialIndex = 0,
+    super.key,
+  });
 
   @override
   State<AudioPlayScreen> createState() => _AudioPlayScreenState();
@@ -95,6 +96,25 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       setState(() {
         _currentPosition = position;
       });
+
+      // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
+      final totalDuration = parseDuration(_playlist[_currentIndex].duration!);
+      if (position.inMilliseconds >= totalDuration.inMilliseconds * 0.99) {
+        // 곡의 끝에 가까운 위치이고, 반복 모드가 켜져 있다면
+        if (isLooping) {
+          print("곡의 끝에 도달하고 반복 모드가 켜져 있어 처음으로 돌아갑니다.");
+
+          setState(() {
+            // ProgressBar 초기화를 위해 _currentPosition 설정
+            _currentPosition = Duration.zero;
+          });
+
+          // 오디오 플레이어 위치 초기화 및 재생
+          audioPlayer.seek(Duration.zero).then((_) {
+            audioPlayer.play();
+          });
+        }
+      }
     });
 
     // 플레이어 상태 스트림 리스너 설정
@@ -105,8 +125,12 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
           setState(() {
             _currentPosition = Duration.zero;
           });
-          audioPlayer.seek(Duration.zero);
-          audioPlayer.play();
+          // 약간의 지연 후 오디오 재생 (UI 업데이트 후)
+          Future.delayed(Duration(milliseconds: 50), () {
+            audioPlayer.seek(Duration.zero).then((_) {
+              audioPlayer.play();
+            });
+          });
         }
       }
     });
@@ -239,7 +263,30 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                       total: parseDuration(video.duration!),
                       timeLabelLocation: TimeLabelLocation.sides,
                       onSeek: (duration) {
+                        // 사용자가 직접 탐색한 경우 해당 위치로 이동
                         audioPlayer.seek(duration);
+
+                        // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
+                        final totalDuration = parseDuration(video.duration!);
+                        if (duration.inMilliseconds >=
+                            totalDuration.inMilliseconds * 0.99) {
+                          // 곡의 끝에 가까운 위치로 탐색했고, 반복 모드가 켜져 있다면
+                          if (isLooping) {
+                            print("곡의 끝에 도달하고 반복 모드가 켜져 있어 처음으로 돌아갑니다.");
+                            // 약간의 지연 후 처음으로 돌아가기 (UI 업데이트를 위해)
+                            Future.delayed(Duration(milliseconds: 50), () {
+                              setState(() {
+                                // ProgressBar 초기화를 위해 _currentPosition 설정
+                                _currentPosition = Duration.zero;
+                              });
+
+                              // 오디오 플레이어 위치 초기화 및 재생
+                              audioPlayer.seek(Duration.zero).then((_) {
+                                audioPlayer.play();
+                              });
+                            });
+                          }
+                        }
                       },
                     ),
                   ),

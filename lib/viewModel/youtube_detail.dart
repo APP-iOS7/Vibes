@@ -78,16 +78,26 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   Padding _topAppbar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(); // 현재 화면 닫기
+            },
+            child: Icon(Icons.keyboard_arrow_down_rounded, size: 25),
+          ),
           Text(
             "KLS PREVIEW",
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          Icon(Icons.menu, size: 25)
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop(); // 현재 화면 닫기
+            },
+            child: Icon(Icons.close_rounded, size: 25),
+          ),
         ],
       ),
     );
@@ -208,14 +218,28 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
               uploadDate: video.uploadDate,
               thumbnailUrls: convertThumnailURL(video.thumbnails!),
             );
-            // 오디오 다운로드
-            FileServices.instance.downloadVideo(video: selectedVideo);
-            // 뒤로 가기  <- 바텀시트
-            Navigator.of(context).pop();
+            FileServices.instance
+                .isVideoDownloaded(videoId: video.videoId!)
+                .then((isDownloaded) {
+              if (isDownloaded) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('이미 다운로드된 영상입니다.'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+                Navigator.of(context).pop();
+              } else {
+                // 오디오 다운로드
+                FileServices.instance.downloadVideo(video: selectedVideo);
+                // 뒤로 가기  <- 바텀시트
+                Navigator.of(context).pop();
 
-            // playlist 저장
-            Provider.of<PlayListState>(context, listen: false)
-                .createPlayList(selectedVideo);
+                // playlist 저장
+                Provider.of<PlayListState>(context, listen: false)
+                    .createPlayList(selectedVideo);
+              }
+            });
           },
           child: Text(
             "다운로드",

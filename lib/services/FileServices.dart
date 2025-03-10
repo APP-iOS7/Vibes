@@ -64,6 +64,15 @@ class FileServices {
     }
   }
 
+  Future<bool> isVideoDownloaded({required String videoId}) async {
+    // 앱 전용 저장소 경로 가져오기
+    var directory = await getApplicationDocumentsDirectory();
+    // 읽을 파일 경로
+    var filePath = File('${directory.path}/$videoId.mp4');
+    // 파일 존재 여부 확인
+    return filePath.exists();
+  }
+
   Future<void> readAudioFile({required String videoId}) async {
     // 앱 전용 저장소 경로 가져오기
     var directory = await getApplicationDocumentsDirectory();

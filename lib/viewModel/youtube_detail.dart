@@ -51,7 +51,8 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
         "volume : ${_youtubePlayerController.value.volume} / sound : $soundVolume");
 
     return Padding(
-      padding: const EdgeInsets.all(12.0),
+      padding:
+          const EdgeInsets.symmetric(vertical: kToolbarHeight, horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

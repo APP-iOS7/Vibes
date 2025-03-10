@@ -17,18 +17,12 @@ class PlayListTile2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AudioPlayScreen(
-              videoModel: video,
-              playlist: allVideos,
-              initialIndex: currentIndex,
-            ),
-          ),
-        );
-      },
+      onTap: () => showDetailAudio(
+        selectedVideo: video,
+        playlist: allVideos,
+        initialIndex: currentIndex,
+        context: context,
+      ),
       title: Text(video.title!,
           style:
               Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),

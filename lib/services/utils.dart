@@ -55,8 +55,12 @@ void showDetailVideo(
 }
 
 // 상세한 오디오 정보를 가져오고 음악을 실제로 듣는 View 입니다.
-void showDetailAudio(
-    {required VideoModel selectedVideo, required BuildContext context}) {
+void showDetailAudio({
+  required VideoModel selectedVideo,
+  required BuildContext context,
+  List<VideoModel>? playlist,
+  int initialIndex = 0,
+}) {
   showModalBottomSheet(
     isScrollControlled: true,
     context: context,
@@ -67,6 +71,8 @@ void showDetailAudio(
         color: Theme.of(context).colorScheme.surface,
         child: AudioPlayScreen(
           videoModel: selectedVideo,
+          playlist: playlist,
+          initialIndex: initialIndex,
         ),
       );
     },

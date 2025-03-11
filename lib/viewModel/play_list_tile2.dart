@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/utils.dart';
-import 'package:kls_project/viewModel/audio_play_screen.dart';
 
 class PlayListTile2 extends StatelessWidget {
   final VideoModel video;

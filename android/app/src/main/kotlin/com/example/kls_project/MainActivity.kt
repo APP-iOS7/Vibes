@@ -1,5 +1,11 @@
-package com.example.kls_project
+package com.example.yourapp
 
-import io.flutter.embedding.android.FlutterActivity
+import .flutter.embedding.android.FlutterActivity
 
-class MainActivity : FlutterActivity()
+class null {       
+    }
+
+    fun FlutterActivity() {
+
+    }
+

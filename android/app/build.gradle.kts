@@ -28,8 +28,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+         multiDexEnabled true
     }
-
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.9.0'
+}
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.

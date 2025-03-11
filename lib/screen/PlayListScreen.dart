@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/FileServices.dart';
 import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/viewModel/play_list_tile2.dart';
 import 'package:provider/provider.dart';

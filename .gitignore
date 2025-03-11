@@ -36,6 +36,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+devtools_options.yaml
 
 # Symbolication related
 app.*.symbols
@@ -50,3 +51,12 @@ app.*.map.json
 
 # metadata remove
 .metadata
+
+# iOS related
+/ios/Flutter/Debug.xcconfig
+/ios/Flutter/Release.xcconfig
+/ios/Runner.xcodeproj/project.pbxproj
+/ios/Runnerxcworkspace/contents.scworkspacedata
+
+# Hive related
+/lib/model/VideoModel.g.dart

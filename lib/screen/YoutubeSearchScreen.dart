@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/services/utils.dart';
 import 'package:kls_project/viewModel/play_list_tile.dart';
@@ -62,7 +61,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
                           width: double.infinity,
                           height: double.infinity,
                           child: Text(
-                            "추천 ex) 만두쌤의 코딩 한 코집",
+                            "추천 ex) 만두쌤의 코딩 한 꼬집",
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
@@ -92,7 +91,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
 
     return SearchBar(
       controller: _queryController,
-      hintText: "듣고 싶은 음악을 선택해주세요",
+      hintText: "듣고 싶은 음악을 검색해주세요",
       hintStyle: WidgetStateProperty.all(Theme.of(context).textTheme.bodySmall),
       leading: IconButton(
           icon: Icon(Icons.search),
@@ -137,8 +136,15 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
 
   // 리스트 뷰
   ListView _searchListView(AsyncSnapshot<dynamic> snapshot) {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: snapshot.data?.length ?? 0,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        thickness: 0.5,
+        indent: 16,
+        endIndent: 16,
+        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+      ),
       itemBuilder: (BuildContext context, int index) {
         Video video = snapshot.data[index];
         return GestureDetector(

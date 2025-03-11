@@ -7,7 +7,6 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/utils.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:kls_project/viewModel/play_list_tile2.dart';
 
 // 오디오를 자세하게 보여주며 실행하는 스크린 입니다.
 class AudioPlayScreen extends StatefulWidget {
@@ -113,23 +112,24 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
           audioPlayer.seek(Duration.zero).then((_) {
             audioPlayer.play();
           });
-        } 
+        }
         // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
         else if (!isLooping && hasNextSong()) {
           print("positionStream: 곡의 끝에 도달하고 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
-          
+
           // 현재 오디오 플레이어 정지
           audioPlayer.stop();
-          
+
           // 다음 곡으로 이동
           setState(() {
             _currentIndex++;
             _currentPosition = Duration.zero; // 위치 초기화
           });
-          
+
           // 즉시 다음 곡 재생 시작
-          playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
-          
+          playSoundinFile(
+              audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+
           // 사용자에게 알림
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -155,23 +155,24 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
               audioPlayer.play();
             });
           });
-        } 
+        }
         // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
         else if (!isLooping && hasNextSong()) {
           print("playerStateStream: 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
-          
+
           // 현재 오디오 플레이어 정지
           audioPlayer.stop();
-          
+
           // 다음 곡으로 이동
           setState(() {
             _currentIndex++;
             _currentPosition = Duration.zero; // 위치 초기화
           });
-          
+
           // 즉시 다음 곡 재생 시작
-          playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
-          
+          playSoundinFile(
+              audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+
           // 사용자에게 알림
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -182,7 +183,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
         } else {
           // 다음 곡이 없는 경우 (플레이리스트의 마지막 곡)
           print("playerStateStream: 플레이리스트의 마지막 곡이 끝났습니다.");
-          
+
           // 사용자에게 알림
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -254,7 +255,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       margin: EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-          color: Colors.red,
+          color: Color(0xFF606060).withValues(alpha: 0.5),
           borderRadius: BorderRadius.all(Radius.circular(8))),
       child: AspectRatio(
         aspectRatio: 16 / 9,

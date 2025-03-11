@@ -61,7 +61,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
                           width: double.infinity,
                           height: double.infinity,
                           child: Text(
-                            "추천 ex) 만두쌤의 코딩 한 코집",
+                            "추천 ex) 만두쌤의 코딩 한 꼬집",
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),

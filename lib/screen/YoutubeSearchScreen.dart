@@ -91,7 +91,7 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
 
     return SearchBar(
       controller: _queryController,
-      hintText: "듣고 싶은 음악을 선택해주세요",
+      hintText: "듣고 싶은 음악을 검색해주세요",
       hintStyle: WidgetStateProperty.all(Theme.of(context).textTheme.bodySmall),
       leading: IconButton(
           icon: Icon(Icons.search),

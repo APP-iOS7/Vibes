@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// white Mode
+// 화이트 모드 설정
 ThemeData whiteMode() {
   return ThemeData(
     useMaterial3: true,
@@ -13,7 +13,7 @@ ThemeData whiteMode() {
       error: Colors.redAccent, // Error color
     ),
     textTheme: GoogleFonts.poppinsTextTheme().copyWith(
-      displayLarge: GoogleFonts.montserrat(
+      displayLarge: GoogleFonts.notoSansKr(
         fontSize: 32,
         fontWeight: FontWeight.bold,
         color: Colors.black,
@@ -25,6 +25,11 @@ ThemeData whiteMode() {
       ),
       bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: Colors.black87,
+      ),
+      bodySmall: GoogleFonts.poppins(
+        fontSize: 13,
         fontWeight: FontWeight.normal,
         color: Colors.black87,
       ),
@@ -64,13 +69,13 @@ ThemeData whiteMode() {
     // 수정 필요
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF3c3c3c),
-      selectedItemColor: Color(0xffffffff),
+      selectedItemColor: Colors.black,
       unselectedItemColor: Color(0xFF838383),
       elevation: 8,
     ),
     sliderTheme: SliderThemeData(
-      activeTrackColor: const Color(0xFFE50914),
-      inactiveTrackColor: Colors.grey.shade400,
+      activeTrackColor: Colors.red,
+      inactiveTrackColor: const Color(0xFFE50914),
       thumbColor: const Color(0xFFE50914),
       overlayColor: const Color(0x29E50914),
       trackHeight: 4.0,
@@ -78,6 +83,7 @@ ThemeData whiteMode() {
   );
 }
 
+// 다크 모드 설정
 ThemeData darkMode() {
   return ThemeData(
     useMaterial3: true,
@@ -101,6 +107,11 @@ ThemeData darkMode() {
       ),
       bodyLarge: GoogleFonts.poppins(
         fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: Colors.white70,
+      ),
+      bodySmall: GoogleFonts.poppins(
+        fontSize: 13,
         fontWeight: FontWeight.normal,
         color: Colors.white70,
       ),
@@ -139,7 +150,7 @@ ThemeData darkMode() {
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Color(0xFF3c3c3c),
-      selectedItemColor: Color(0xffffffff),
+      selectedItemColor: Colors.white,
       unselectedItemColor: Color(0xFF838383),
       elevation: 8,
     ),

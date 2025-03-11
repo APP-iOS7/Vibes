@@ -1,122 +1,195 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:kls_project/model/VideoModel.dart';
+import 'package:kls_project/screen/HomeScreen.dart';
+import 'package:kls_project/screen/PlayListScreen.dart';
+import 'package:kls_project/screen/SettingsScreen.dart';
+import 'package:kls_project/screen/YoutubeSearchScreen.dart';
+import 'package:kls_project/services/GlobalSnackBar.dart';
+import 'package:kls_project/screen/dopeScreen.dart';
+import 'package:kls_project/services/PlayListState.dart';
+import 'package:kls_project/services/YoutubeSearchState.dart';
+import 'package:kls_project/theme/theme.dart';
+import 'package:kls_project/viewModel/theme_initialze.dart';
+import 'package:provider/provider.dart';
+import 'package:kls_project/screen/dopeScreen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsBinding widgetsFlutterBinding =
+      WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsFlutterBinding);
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(VideoModelAdapter());
+  await Hive.openBox<VideoModel>('playlist');
+  var tutorialBox = await Hive.openBox<bool>('isTutorial');
+  // 앱을 처음 실행하면 true 아니면 false
+  bool isFirstRun = tutorialBox.get('isTutorial', defaultValue: false) == false;
+
+  // 다음 실행때는 나오지 않도록 값을 넣어줍니다.
+  if (isFirstRun) {
+    await tutorialBox.put('isTutorial', true);
+  }
+  // 백그라운드 재생을 위한 초기화
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
+  runApp(
+    MultiProvider(
+      providers: [
+        // 확장을 위해 멀티 Provider 사용
+        ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
+        ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
+        ChangeNotifierProvider(create: (_) => PlayListState()),
+      ],
+      child: ThemeInitialze(
+        // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
+        child: Consumer<ChangeThemeMode>(
+          builder: (context, changeMode, child) => PageRouteSelection(
+            isFirstRun: isFirstRun, // isFirstRun을 전달 해줍니다.
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class PageRouteSelection extends StatefulWidget {
+  final bool isFirstRun;
+  const PageRouteSelection({required this.isFirstRun, super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<PageRouteSelection> createState() => _NavigationBarAppState();
+}
+
+class _NavigationBarAppState extends State<PageRouteSelection> {
+  bool isFirstRun = false; // 부모에게 받기 위한 상태변수
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove(); // 한곳에서 SplashScreen을 닫게 합니다.
+    isFirstRun = widget.isFirstRun;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'KSL MUSIC',
+      debugShowCheckedModeBanner: false,
+      theme: Provider.of<ChangeThemeMode>(context).themeData,
+      // 글로벌 ScaffoldMessenger 키 설정
+      scaffoldMessengerKey: GlobalSnackBar.key,
+      home: isFirstRun
+          ? DopeScreen(
+              nextMainPage: () {
+                setState(() {
+                  isFirstRun = !isFirstRun;
+                });
+              },
+            )
+          : MainScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainScreen> createState() => _NavigationExampleState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+class _NavigationExampleState extends State<MainScreen> {
+  int currentPageIndex = 0;
+  String titleName = "KLS MUSIC";
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        centerTitle: true,
+        title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      body: <Widget>[
+        /// 홈 스크린
+        HomeScreen(
+          onChange: () {
+            currentPageIndex = 2;
+            setState(() {});
+          },
         ),
+
+        // 음악재생 페이지
+        PlayListScreen(),
+
+        // 검색 페이지
+        YoutubeSearchScreen(
+          streamInjection:
+              Provider.of<Youtubesearchstate>(context, listen: false)
+                  .searchResult,
+        ),
+
+        // 검색 페이지
+        SettingsScreen(),
+      ][currentPageIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentPageIndex,
+        onTap: (index) {
+          setState(() {
+            currentPageIndex = index;
+            if (currentPageIndex > 0) {
+              // 0이 아닌 경우 ex ) KLS MUSIC
+              switch (currentPageIndex) {
+                case 1:
+                  titleName = "플레이 리스트";
+                  break;
+                case 2:
+                  titleName = "검색";
+                  break;
+                case 3:
+                  titleName = "설정";
+                  break;
+              }
+            } else {
+              titleName = "KLS MUSIC";
+            }
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        selectedItemColor:
+            Provider.of<ChangeThemeMode>(context).themeData == whiteMode()
+                ? Colors.black
+                : Colors.white,
+        unselectedItemColor: const Color(0xFF838383),
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home),
+            label: '홈',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.double_music_note),
+            label: '음악',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.search),
+            label: '검색',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.settings),
+            label: '설정',
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

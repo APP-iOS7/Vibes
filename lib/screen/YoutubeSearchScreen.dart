@@ -136,8 +136,15 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
 
   // 리스트 뷰
   ListView _searchListView(AsyncSnapshot<dynamic> snapshot) {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: snapshot.data?.length ?? 0,
+      separatorBuilder: (context, index) => Divider(
+        height: 1,
+        thickness: 0.5,
+        indent: 16,
+        endIndent: 16,
+        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
+      ),
       itemBuilder: (BuildContext context, int index) {
         Video video = snapshot.data[index];
         return GestureDetector(

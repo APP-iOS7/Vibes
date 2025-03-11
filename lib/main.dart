@@ -16,7 +16,6 @@ import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
 import 'package:kls_project/viewModel/theme_initialze.dart';
 import 'package:provider/provider.dart';
-import 'package:kls_project/screen/dopeScreen.dart';
 
 void main() async {
   WidgetsBinding widgetsFlutterBinding =

@@ -4,6 +4,7 @@ import 'package:kls_project/services/utils.dart';
 import 'package:kls_project/viewModel/play_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_scrape_api/models/video.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class YoutubeSearchScreen extends StatefulWidget {
   final Stream<List<Video>> streamInjection;
@@ -13,22 +14,59 @@ class YoutubeSearchScreen extends StatefulWidget {
   State<YoutubeSearchScreen> createState() => _YoutubeSearchScreenState();
 }
 
-// initState가 불린다.. 아무것도 없다..?
 class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   final TextEditingController _queryController = TextEditingController();
+  late final SearchController _searchController;
   bool _isSearching = false;
   bool _isLoading = false;
+  List<String> _searchHistory = [];
+  final String _searchHistoryBoxName = 'searchHistory';
 
   @override
   void initState() {
     super.initState();
     _queryController.clear();
+    _loadSearchHistory();
+
+    // SearchController 초기화
+    _searchController = SearchController();
   }
 
   @override
   void dispose() {
     _queryController.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadSearchHistory() async {
+    var box = await Hive.openBox<String>(_searchHistoryBoxName);
+    setState(() {
+      _searchHistory = box.values.toList();
+    });
+  }
+
+  Future<void> _saveSearchQuery(String query) async {
+    if (query.isEmpty) return;
+
+    var box = await Hive.openBox<String>(_searchHistoryBoxName);
+
+    // 중복 검색어 제거
+    if (_searchHistory.contains(query)) {
+      int index = _searchHistory.indexOf(query);
+      await box.deleteAt(index);
+    }
+
+    // 최대 10개까지만 저장
+    if (_searchHistory.length >= 10) {
+      await box.deleteAt(0);
+    }
+
+    // 새 검색어 추가
+    await box.add(query);
+
+    // 검색 기록 다시 로드
+    await _loadSearchHistory();
   }
 
   @override
@@ -45,7 +83,6 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
               stream: widget.streamInjection,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasError) {
-                  // 에러르 먼저 걸러서 다음처리에는 stream은 초기화가 안돼서 null상태
                   return Center(child: Text("문제가 있습니다.. ${snapshot.error}"));
                 } else {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -89,48 +126,147 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   Widget _buildSearchBar(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
-    return SearchBar(
-      controller: _queryController,
-      hintText: "듣고 싶은 음악을 검색해주세요",
-      hintStyle: WidgetStateProperty.all(Theme.of(context).textTheme.bodySmall),
-      leading: IconButton(
+    return SearchAnchor(
+      isFullScreen: false,
+      viewHintText: "듣고 싶은 음악을 검색해주세요",
+      searchController: _searchController,
+      viewLeading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          _searchController.closeView('');
+        },
+      ),
+      viewTrailing: [
+        IconButton(
           icon: Icon(Icons.search),
           onPressed: () {
-            _performSearch(_queryController.text);
-          }),
-      trailing: [
-        IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () {
-            _queryController.clear();
-            setState(() {
-              _isSearching = false;
-            });
+            String query = _searchController.text;
+            if (query.isNotEmpty) {
+              _searchController.closeView(query);
+              _queryController.text = query;
+              _performSearch(query);
+            }
           },
         ),
       ],
-      onSubmitted: (value) {
-        _performSearch(value);
-      },
-      padding: const WidgetStatePropertyAll<EdgeInsets>(
-        EdgeInsets.symmetric(horizontal: 8.0),
-      ),
-      elevation: const WidgetStatePropertyAll<double>(2.0),
-      backgroundColor: WidgetStateProperty.resolveWith<Color>(
-        (states) => Theme.of(context).colorScheme.surface,
-      ),
-      shadowColor: WidgetStateProperty.all(
-        isDarkMode ? Colors.white : Colors.black,
-      ),
-      shape: WidgetStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(32.0),
-          side: BorderSide(
-            color: isDarkMode ? Colors.white : Colors.black,
-            width: 1.0,
+      builder: (BuildContext context, SearchController controller) {
+        return SearchBar(
+          controller: _queryController,
+          hintText: "듣고 싶은 음악을 검색해주세요",
+          hintStyle:
+              WidgetStateProperty.all(Theme.of(context).textTheme.bodySmall),
+          leading: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {
+                // 검색 아이콘 클릭 시에만 검색 제안 뷰 열기
+                _searchController.text = ''; // 검색 컨트롤러의 텍스트를 비움
+                controller.openView();
+              }),
+          trailing: [
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _queryController.clear();
+                setState(() {
+                  _isSearching = false;
+                });
+              },
+            ),
+          ],
+          onSubmitted: (value) {
+            _performSearch(value);
+          },
+          padding: const WidgetStatePropertyAll<EdgeInsets>(
+            EdgeInsets.symmetric(horizontal: 8.0),
           ),
-        ),
-      ),
+          elevation: const WidgetStatePropertyAll<double>(2.0),
+          backgroundColor: WidgetStateProperty.resolveWith<Color>(
+            (states) => Theme.of(context).colorScheme.surface,
+          ),
+          shadowColor: WidgetStateProperty.all(
+            isDarkMode ? Colors.white : Colors.black,
+          ),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(32.0),
+              side: BorderSide(
+                color: isDarkMode ? Colors.white : Colors.black,
+                width: 1.0,
+              ),
+            ),
+          ),
+        );
+      },
+      suggestionsBuilder: (BuildContext context, SearchController controller) {
+        // 검색어 입력 시 검색 기록에서 필터링
+        String query = controller.text.toLowerCase();
+        List<String> filteredHistory = _searchHistory
+            .where((item) => item.toLowerCase().contains(query))
+            .toList();
+        List<Widget> results = [];
+
+        if (filteredHistory.isEmpty) {
+          results.add(Center(
+              child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text("검색 기록이 없습니다."))));
+
+          if (query.isNotEmpty) {
+            results.add(ListTile(
+                leading: Icon(Icons.search),
+                title: Text('"$query" 검색하기'),
+                onTap: () {
+                  _queryController.text = query;
+                  controller.closeView(query);
+                  _performSearch(query);
+                }));
+          }
+        } else {
+          // 최신 검색어가 위에 표시되도록 역순으로 정렬
+          List<String> reversedHistory = List.from(filteredHistory.reversed);
+
+          // 새 검색어 옵션 추가 (입력된 검색어가 있는 경우)
+          if (query.isNotEmpty && !filteredHistory.contains(query)) {
+            results.add(ListTile(
+              leading: Icon(Icons.search),
+              title: Text('"$query" 검색하기'),
+              onTap: () {
+                controller.closeView(query);
+                _queryController.text = query;
+                _performSearch(query);
+              },
+            ));
+          }
+
+          // 검색 기록 추가
+          results.addAll(reversedHistory.map((historyQuery) {
+            return ListTile(
+              leading: Icon(Icons.history),
+              title: Text(historyQuery),
+              trailing: IconButton(
+                icon: Icon(Icons.close, size: 16),
+                onPressed: () async {
+                  var box = await Hive.openBox<String>(_searchHistoryBoxName);
+                  int index = _searchHistory.indexOf(historyQuery);
+                  if (index != -1) {
+                    await box.deleteAt(index);
+                    await _loadSearchHistory();
+                    // 검색 제안 UI 업데이트를 위해 컨트롤러 새로고침
+                    controller.openView();
+                  }
+                },
+              ),
+              onTap: () {
+                _queryController.text = historyQuery;
+                controller.closeView(historyQuery);
+                _performSearch(historyQuery);
+              },
+            );
+          }).toList());
+        }
+
+        return results;
+      },
     );
   }
 
@@ -148,9 +284,10 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       itemBuilder: (BuildContext context, int index) {
         Video video = snapshot.data[index];
         return GestureDetector(
-          onTapDown: (details) => FocusManager.instance.primaryFocus?.unfocus(),
-          onTapUp: (details) => FocusManager.instance.primaryFocus?.unfocus(),
-          onTap: () => showDetailVideo(selectedVideo: video, context: context),
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+            showDetailVideo(selectedVideo: video, context: context);
+          },
           child: PlayListTile(video: video),
         );
       },
@@ -167,8 +304,16 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
       _isLoading = true;
     });
 
-    Provider.of<Youtubesearchstate>(context, listen: false)
-        .serachYoutube(query: query);
+    // 검색어 저장
+    _saveSearchQuery(query);
+
+    // 검색 실행 - 약간의 지연을 추가하여 UI 업데이트 후 검색이 실행되도록 함
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (mounted) {
+        Provider.of<Youtubesearchstate>(context, listen: false)
+            .serachYoutube(query: query);
+      }
+    });
 
     FocusManager.instance.primaryFocus?.unfocus();
   }

@@ -72,9 +72,9 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   late List<VideoModel> _originalPlaylist; // 원본 플레이리스트 저장
   late int _currentIndex;
 
-  @override
-  void initState() {
-    super.initState();
+  // 초기화 과정
+  void initSettings() {
+    _playlist = widget.playlist!;
     // 플레이리스트 초기화
     if (widget.playlist != null && widget.playlist!.isNotEmpty) {
       _playlist = List.from(widget.playlist!); // 복사본 생성
@@ -89,59 +89,22 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     // 오디오 플레이어 초기화
     audioPlayer.setLoopMode(LoopMode.off);
     playSoundinFile(audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
+  }
 
-    // 위치 스트림 리스너 설정
+  // 오디오 스트림 부분 함수 처리
+  void audioStream() {
     audioPlayer.positionStream.listen((position) {
       setState(() {
         _currentPosition = position;
+        print(_currentPosition);
       });
 
-      // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
-      final totalDuration = parseDuration(_playlist[_currentIndex].duration!);
-      if (position.inMilliseconds >= totalDuration.inMilliseconds * 0.99) {
-        // 곡의 끝에 가까운 위치이고, 반복 모드가 켜져 있다면
-        if (isLooping) {
-          print("곡의 끝에 도달하고 반복 모드가 켜져 있어 처음으로 돌아갑니다.");
-
-          setState(() {
-            // ProgressBar 초기화를 위해 _currentPosition 설정
-            _currentPosition = Duration.zero;
-          });
-
-          // 오디오 플레이어 위치 초기화 및 재생
-          audioPlayer.seek(Duration.zero).then((_) {
-            audioPlayer.play();
-          });
-        }
-        // 반복 모드가 꺼져 있고 다음 곡이 있다면 다음 곡 재생
-        else if (!isLooping && hasNextSong()) {
-          print("positionStream: 곡의 끝에 도달하고 반복 모드가 꺼져 있어 다음 곡으로 넘어갑니다.");
-
-          // 현재 오디오 플레이어 정지
-          audioPlayer.stop();
-
-          // 다음 곡으로 이동
-          setState(() {
-            _currentIndex++;
-            _currentPosition = Duration.zero; // 위치 초기화
-          });
-
-          // 즉시 다음 곡 재생 시작
-          playSoundinFile(
-              audioPlayer: audioPlayer, video: _playlist[_currentIndex]);
-
-          // 사용자에게 알림
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('다음 곡을 재생합니다: ${_playlist[_currentIndex].title}'),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        }
-      }
+      // UI 업데이트를 위한 현재 위치 추적만 수행
+      // 곡 전환 로직은 playStream()에서 처리하도록 함
     });
+  }
 
-    // 플레이어 상태 스트림 리스너 설정
+  void playStream() {
     audioPlayer.playerStateStream.listen((playerState) {
       if (playerState.processingState == ProcessingState.completed) {
         if (isLooping) {
@@ -194,6 +157,18 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
         }
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initSettings(); // 초기화 과정 함수정의
+
+    // 위치 스트림 리스너 설정
+    audioStream();
+
+    // 플레이어 상태 스트림 리스너 설정
+    playStream();
   }
 
   @override
@@ -319,12 +294,12 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                   Expanded(
                     child: ProgressBar(
                       progress: snapshot.data!,
-                      buffered: parseDuration(video.duration!),
                       total: parseDuration(video.duration!),
                       timeLabelLocation: TimeLabelLocation.sides,
                       onSeek: (duration) {
                         // 사용자가 직접 탐색한 경우 해당 위치로 이동
                         audioPlayer.seek(duration);
+                        print("duration : $duration");
 
                         // 현재 위치가 곡의 끝에 가까운지 확인 (99% 이상)
                         final totalDuration = parseDuration(video.duration!);

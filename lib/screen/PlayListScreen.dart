@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:kls_project/model/VideoModel.dart';
 import 'package:kls_project/services/PlayListState.dart';
-import 'package:kls_project/viewModel/play_list_tile2.dart';
+import 'package:kls_project/components/play_list_tile2.dart';
 import 'package:provider/provider.dart';
 
 class PlayListScreen extends StatelessWidget {
@@ -17,9 +17,11 @@ class PlayListScreen extends StatelessWidget {
           if (playListState.playlist.isEmpty) {
             // 플레이 리스트가 비어있다면
             return Center(
-              child: Text(
-                "플레이 리스트를 추가해 주세요 :( ",
-                style: Theme.of(context).textTheme.bodySmall,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.asset(
+                  "assets/images/noPlayList.png",
+                ),
               ),
             );
           }

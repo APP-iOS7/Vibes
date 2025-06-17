@@ -22,7 +22,6 @@ class YoutubeDetailView extends StatefulWidget {
 
 class _YoutubeDetailViewState extends State<YoutubeDetailView> {
   late YoutubePlayerController _youtubePlayerController; // 유튭 동영상 controller
-  int soundVolume = 50; // 이페이지에 들어올때 soundVolume은 50으로 초기화
 
   @override
   void initState() {
@@ -36,7 +35,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
         showLiveFullscreenButton: false,
         enableCaption: false,
       ),
-    )..setVolume(soundVolume);
+    );
   }
 
   @override
@@ -48,9 +47,6 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "volume : ${_youtubePlayerController.value.volume} / sound : $soundVolume");
-
     return Padding(
       padding:
           const EdgeInsets.symmetric(vertical: kToolbarHeight, horizontal: 12),
@@ -68,8 +64,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
           SizedBox(height: 5.0),
           // 조회수 뷰뷰
           _detailViews(context),
-          // slider 부분
-          _customSoundSlider(),
+          SizedBox(height: 5.0),
           // 다운로드 버튼 뷰
           _downloadButton(context, video: widget.detailVideo),
         ],
@@ -150,33 +145,6 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(widget.detailVideo.title!,
           style: Theme.of(context).textTheme.titleLarge),
-    );
-  }
-
-  Row _customSoundSlider() {
-    return Row(
-      children: [
-        Icon(Icons.volume_down),
-        Expanded(
-          child: Slider(
-            // 볼륨 값 (0~100을 0~1로 변환해서 사용)
-            value: (soundVolume / 100).toDouble(),
-            min: 0.0,
-            max: 1.0,
-            onChanged: (value) {
-              // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
-              setState(() {
-                soundVolume = (value * 100).toInt();
-                _youtubePlayerController.setVolume(soundVolume);
-              });
-            },
-            activeColor: Theme.of(context).sliderTheme.activeTrackColor,
-            inactiveColor: Colors.grey,
-            thumbColor: Colors.red,
-          ),
-        ),
-        Icon(Icons.volume_up),
-      ],
     );
   }
 

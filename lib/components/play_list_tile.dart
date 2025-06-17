@@ -8,9 +8,10 @@ class PlayListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 14),
       title: Text(video.title!,
           style:
-              Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),
+              Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 14)),
       subtitle: Row(
         children: [
           Text(video.uploadDate!),

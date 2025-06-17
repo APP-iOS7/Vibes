@@ -14,7 +14,7 @@ import 'package:kls_project/screen/dopeScreen.dart';
 import 'package:kls_project/services/PlayListState.dart';
 import 'package:kls_project/services/YoutubeSearchState.dart';
 import 'package:kls_project/theme/theme.dart';
-import 'package:kls_project/viewModel/theme_initialze.dart';
+import 'package:kls_project/components/theme_initialze.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

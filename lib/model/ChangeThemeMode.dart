@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/theme/theme.dart';
+import 'package:Vibes/theme/theme.dart';
 
 class ChangeThemeMode extends ChangeNotifier {
   ThemeData? _themeData; // 내부에서만 사용 가능한 themeData

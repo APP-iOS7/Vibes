@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/services/YoutubeSearchState.dart';
-import 'package:kls_project/services/utils.dart';
-import 'package:kls_project/components/play_list_tile.dart';
+import 'package:Vibes/services/YoutubeSearchState.dart';
+import 'package:Vibes/services/utils.dart';
+import 'package:Vibes/components/play_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_scrape_api/models/video.dart';
 import 'package:hive_flutter/hive_flutter.dart';

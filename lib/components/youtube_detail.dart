@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/FileServices.dart';
-import 'package:kls_project/services/GlobalSnackBar.dart';
-import 'package:kls_project/services/PlayListState.dart';
-import 'package:kls_project/services/utils.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/FileServices.dart';
+import 'package:Vibes/services/GlobalSnackBar.dart';
+import 'package:Vibes/services/PlayListState.dart';
+import 'package:Vibes/services/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtube_scrape_api/models/video.dart';

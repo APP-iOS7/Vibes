@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/components/audio_play_screen.dart';
-import 'package:kls_project/components/youtube_detail.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/components/audio_play_screen.dart';
+import 'package:Vibes/components/youtube_detail.dart';
 import 'package:youtube_scrape_api/models/thumbnail.dart';
 import 'package:youtube_scrape_api/models/video.dart' as scrape;
 

@@ -19,7 +19,7 @@ lib/
 │   ├── dopeScreen.dart
 │   └── ...
 ├── service/        # Provider 상태관리 또는 파일 시스템 기능
-├── viewModel/     # 재사용 가능한 UI 컴포넌트
+├── components/     # 재사용 가능한 UI 컴포넌트
 ├── theme/          # 테마 설정 (라이트/다크 모드)
 └── main.dart       # 애플리케이션 진입점
 ```

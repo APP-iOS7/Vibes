@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_scrape_api/models/video.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/utils.dart';
 
-class PlayListTile extends StatelessWidget {
-  final Video video;
-  const PlayListTile({required this.video, super.key});
+class PlayListTile2 extends StatelessWidget {
+  final VideoModel video;
+  final List<VideoModel> allVideos;
+  final int currentIndex;
+
+  const PlayListTile2(
+      {required this.video,
+      required this.allVideos,
+      required this.currentIndex,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () => showDetailAudio(
+        selectedVideo: video,
+        playlist: allVideos,
+        initialIndex: currentIndex,
+        context: context,
+      ),
       title: Text(video.title!,
           style:
               Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),
@@ -22,7 +36,7 @@ class PlayListTile extends StatelessWidget {
         children: [
           AspectRatio(
             aspectRatio: 16 / 9,
-            child: Image.network(video.thumbnails!.first.url!),
+            child: Image.network(video.thumbnailUrls!.first.toString()),
           ),
           Positioned(
             bottom: 3,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/FileServices.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/FileServices.dart';
 
 class PlayListState extends ChangeNotifier {
   final Box<VideoModel> _playlistBox = Hive.box<VideoModel>("playlist");

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/ChangeThemeMode.dart';
+import 'package:Vibes/model/ChangeThemeMode.dart';
 import 'package:provider/provider.dart';
 
 class ThemeInitialze extends StatelessWidget {

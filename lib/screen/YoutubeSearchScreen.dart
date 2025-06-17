@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kls_project/services/YoutubeSearchState.dart';
-import 'package:kls_project/services/utils.dart';
-import 'package:kls_project/viewModel/play_list_tile.dart';
+import 'package:Vibes/services/YoutubeSearchState.dart';
+import 'package:Vibes/services/utils.dart';
+import 'package:Vibes/components/play_list_tile.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_scrape_api/models/video.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -97,9 +97,13 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
                           alignment: Alignment.center,
                           width: double.infinity,
                           height: double.infinity,
-                          child: Text(
-                            "추천 ex) 만두쌤의 코딩 한 꼬집",
-                            style: Theme.of(context).textTheme.bodyLarge,
+                          child: Center(
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: Image.asset(
+                                "assets/images/noSearchFound.png",
+                              ),
+                            ),
                           ),
                         ),
                       );

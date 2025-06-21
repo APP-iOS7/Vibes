@@ -22,7 +22,6 @@ class YoutubeDetailView extends StatefulWidget {
 
 class _YoutubeDetailViewState extends State<YoutubeDetailView> {
   late YoutubePlayerController _youtubePlayerController; // 유튭 동영상 controller
-
   @override
   void initState() {
     super.initState();
@@ -42,7 +41,6 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
   void dispose() {
     _youtubePlayerController.dispose();
     super.dispose();
-    print(_youtubePlayerController);
   }
 
   @override
@@ -62,10 +60,10 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
           // channel 주인 및 업로드 날짜 View
           _channelNameAndUpload(context),
           SizedBox(height: 5.0),
-          // 조회수 뷰뷰
+          // 조회수 뷰
           _detailViews(context),
-          SizedBox(height: 5.0),
           // 다운로드 버튼 뷰
+          SizedBox(height: 10),
           _downloadButton(context, video: widget.detailVideo),
         ],
       ),
@@ -171,11 +169,11 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
     );
   }
 
-  Expanded _downloadButton(BuildContext context, {required Video video}) {
-    return Expanded(
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
+  Row _downloadButton(BuildContext context, {required Video video}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
           onPressed: () {
             // VideoModel 객체 생성
             final selectedVideo = VideoModel(
@@ -225,15 +223,10 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
               }
             });
           },
-          child: Text(
-            "다운로드",
-            style: Theme.of(context)
-                .textTheme
-                .displayLarge!
-                .copyWith(color: Colors.white),
-          ),
+          icon: Icon(Icons.download),
         ),
-      ),
+        IconButton(onPressed: () {}, icon: Icon(Icons.share_rounded))
+      ],
     );
   }
 }

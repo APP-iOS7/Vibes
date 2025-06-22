@@ -12,7 +12,6 @@ import 'package:Vibes/screen/PlayListScreen.dart';
 import 'package:Vibes/screen/SettingsScreen.dart';
 import 'package:Vibes/screen/YoutubeSearchScreen.dart';
 import 'package:Vibes/services/GlobalSnackBar.dart';
-import 'package:Vibes/screen/dopeScreen.dart';
 import 'package:Vibes/services/PlayListState.dart';
 import 'package:Vibes/services/YoutubeSearchState.dart';
 import 'package:Vibes/theme/theme.dart';
@@ -27,14 +26,7 @@ void main() async {
 
   Hive.registerAdapter(VideoModelAdapter());
   await Hive.openBox<VideoModel>('playlist');
-  var tutorialBox = await Hive.openBox<bool>('isTutorial');
-  // 앱을 처음 실행하면 true 아니면 false
-  bool isFirstRun = tutorialBox.get('isTutorial', defaultValue: false) == false;
 
-  // 다음 실행때는 나오지 않도록 값을 넣어줍니다.
-  if (isFirstRun) {
-    await tutorialBox.put('isTutorial', true);
-  }
   // 백그라운드 재생을 위한 초기화
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
@@ -53,9 +45,7 @@ void main() async {
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
         child: Consumer<ChangeThemeMode>(
-          builder: (context, changeMode, child) => PageRouteSelection(
-            isFirstRun: isFirstRun, // isFirstRun을 전달 해줍니다.
-          ),
+          builder: (context, changeMode, child) => PageRouteSelection(),
         ),
       ),
     ),
@@ -63,21 +53,17 @@ void main() async {
 }
 
 class PageRouteSelection extends StatefulWidget {
-  final bool isFirstRun;
-  const PageRouteSelection({required this.isFirstRun, super.key});
+  const PageRouteSelection({super.key});
 
   @override
   State<PageRouteSelection> createState() => _NavigationBarAppState();
 }
 
 class _NavigationBarAppState extends State<PageRouteSelection> {
-  bool isFirstRun = false; // 부모에게 받기 위한 상태변수
-
   @override
   void initState() {
     super.initState();
     FlutterNativeSplash.remove(); // 한곳에서 SplashScreen을 닫게 합니다.
-    isFirstRun = widget.isFirstRun;
   }
 
   @override
@@ -88,15 +74,7 @@ class _NavigationBarAppState extends State<PageRouteSelection> {
       theme: Provider.of<ChangeThemeMode>(context).themeData,
       // 글로벌 ScaffoldMessenger 키 설정
       scaffoldMessengerKey: GlobalSnackBar.key,
-      home: isFirstRun
-          ? DopeScreen(
-              nextMainPage: () {
-                setState(() {
-                  isFirstRun = !isFirstRun;
-                });
-              },
-            )
-          : MainScreen(),
+      home: MainScreen(),
     );
   }
 }
@@ -152,14 +130,15 @@ class _NavigationExampleState extends State<MainScreen> {
             child: Consumer<AudioPlayerState>(
               builder: (context, audioState, child) {
                 if (!audioState.isSongPlaying) return SizedBox.shrink();
-
+                // 현재 비디오 및 index 가져오기
                 final currentVideo = audioState.currentVideo;
+                audioState.getCurrentIndex(context);
+
                 return GestureDetector(
                   onTap: () => showDetailAudio(
                     selectedVideo: currentVideo,
                     playlist: Provider.of<PlayListState>(context, listen: false)
                         .playlist,
-                    initialIndex: 0,
                     context: context,
                   ),
                   child: Container(

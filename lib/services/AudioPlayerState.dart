@@ -1,31 +1,44 @@
 import 'dart:io';
 import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/PlayListState.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 class AudioPlayerState with ChangeNotifier {
+  /// 현재 재생 중인 인덱스 (플레이리스트 사용 시)
+  late int _currentIndex;
+  int get currentIndex => _currentIndex;
+
   bool isSongPlaying = false; // 노래 재생 여부
   final AudioPlayer _audioPlayer = AudioPlayer();
-  ConcatenatingAudioSource _playlist = ConcatenatingAudioSource(children: []);
-
+  final ConcatenatingAudioSource _playlist =
+      ConcatenatingAudioSource(children: []);
+  get playList => _playlist;
   AudioPlayer get audioPlayer => _audioPlayer;
 
   VideoModel? _currentVideo;
   get currentVideo => _currentVideo;
-
+  // 재생 변수
   bool _isPlaying = false;
   bool get isPlaying => _isPlaying;
+
+  // 루프 변수
+  bool _isLooping = false;
+  bool get isLooping => _isLooping;
+
+  // 셔플 변수
+  bool _isShuffling = false;
+  bool get isShuffling => _isShuffling;
 
   Duration _currentPosition = Duration.zero;
   Duration get currentPosition => _currentPosition;
 
   Duration _totalDuration = Duration.zero;
   Duration get totalDuration => _totalDuration;
-
-  /// 현재 재생 중인 인덱스 (플레이리스트 사용 시)
-  int? get currentIndex => _audioPlayer.currentIndex;
 
   AudioPlayerState() {
     // 상태 변화 리스너 등록
@@ -45,6 +58,27 @@ class AudioPlayerState with ChangeNotifier {
       _currentPosition = position;
       notifyListeners();
     });
+  }
+  // loop 할지를 토글 하는 함수 및 LoopMode
+  void loopSet() {
+    _isLooping = !_isLooping;
+    if (_isLooping) {
+      audioPlayer.setLoopMode(LoopMode.one);
+    } else {
+      audioPlayer.setLoopMode(LoopMode.off);
+    }
+    notifyListeners();
+  }
+
+  // 셔플 기능의 토글 함수
+  void shuffleSet() {
+    _isShuffling = !_isShuffling;
+    if (_isShuffling) {
+      print("셔플이 가능한 상태 입니다");
+    } else {
+      print("셔플이 가능한 비활성 상태 입니다");
+    }
+    notifyListeners();
   }
 
   /// 오디오 재생
@@ -92,7 +126,14 @@ class AudioPlayerState with ChangeNotifier {
     }
   }
 
-  /// 일시정지
+  void getCurrentIndex(BuildContext context) {
+    // currentIndex 넣어주기
+    _currentIndex = Provider.of<PlayListState>(context, listen: false)
+        .playlist
+        .indexOf(_currentVideo!);
+  }
+
+  // 재생 및 일시 정지
   Future<void> audioPlay() async {
     if (_isPlaying) {
       await _audioPlayer.pause();
@@ -103,17 +144,6 @@ class AudioPlayerState with ChangeNotifier {
     notifyListeners();
   }
 
-  /// 플레이리스트 설정
-  Future<void> setPlaylist(List<String> filePaths,
-      {int initialIndex = 0}) async {
-    _playlist = ConcatenatingAudioSource(
-      children:
-          filePaths.map((path) => AudioSource.uri(Uri.file(path))).toList(),
-    );
-    await _audioPlayer.setAudioSource(_playlist, initialIndex: initialIndex);
-    await _audioPlayer.play();
-  }
-
   /// 해제
   void disposePlayer() async {
     await _audioPlayer.stop();
@@ -121,6 +151,34 @@ class AudioPlayerState with ChangeNotifier {
     _isPlaying = false;
     _currentVideo = null;
     isSongPlaying = false; // 하단 재생 바 여부
+    notifyListeners();
+  }
+
+  // audio 뒤로가기 함수
+  void playPreviousSong(BuildContext context) {
+    if (_currentIndex > 0) {
+      _currentIndex--;
+      final video = Provider.of<PlayListState>(context, listen: false)
+          .playlist[currentIndex];
+      _currentVideo = video;
+    }
+
+    playSoundinFile(_audioPlayer, _currentVideo!);
+    notifyListeners();
+  }
+
+  // audio 앞으로 가기 함수
+  void playNextSong(BuildContext context) {
+    final maxPlayList =
+        Provider.of<PlayListState>(context, listen: false).playlist.length;
+    if (_currentIndex < maxPlayList - 1) {
+      _currentIndex++;
+      final video = Provider.of<PlayListState>(context, listen: false)
+          .playlist[currentIndex];
+      _currentVideo = video;
+    }
+
+    playSoundinFile(_audioPlayer, _currentVideo!);
     notifyListeners();
   }
 }

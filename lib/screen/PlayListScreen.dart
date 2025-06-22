@@ -1,3 +1,4 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -47,7 +48,6 @@ class PlayListScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                // child: PlayListTile2(video: music),
                 child: PlayListTile2(
                   video: music,
                 ),

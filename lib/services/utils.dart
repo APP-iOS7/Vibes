@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:Vibes/model/VideoModel.dart';
-import 'package:Vibes/components/audio_play_screen.dart';
+import 'package:Vibes/screen/audioPlayerScreen.dart';
+import 'package:flutter/material.dart';
 import 'package:Vibes/components/youtube_detail.dart';
 import 'package:youtube_scrape_api/models/thumbnail.dart';
 import 'package:youtube_scrape_api/models/video.dart' as scrape;
@@ -37,21 +37,6 @@ Duration parseDuration(String duration) {
   return Duration.zero; // 변환 실패 시 기본값
 }
 
-// 상세한 비디오 영상과 정보를 가져오고 미리 preview 처럼 보여주는 함수
-void showDetailVideo(
-    {required scrape.Video selectedVideo, required BuildContext context}) {
-  showModalBottomSheet(
-    isScrollControlled: true,
-    context: context,
-    builder: (context) {
-      return Container(
-        color: Theme.of(context).colorScheme.surface,
-        child: YoutubeDetailView(detailVideo: selectedVideo),
-      );
-    },
-  );
-}
-
 // 상세한 오디오 정보를 가져오고 음악을 실제로 듣는 View 입니다.
 void showDetailAudio({
   required VideoModel selectedVideo,
@@ -67,11 +52,24 @@ void showDetailAudio({
         width: double.infinity,
         height: MediaQuery.of(context).size.height, // 앱바 높이만큼 제외
         color: Theme.of(context).colorScheme.surface,
-        child: AudioPlayScreen(
-          videoModel: selectedVideo,
-          playlist: playlist,
-          initialIndex: initialIndex,
+        child: AudioPlayerScreen(
+          currentVideo: selectedVideo,
         ),
+      );
+    },
+  );
+}
+
+// 상세한 비디오 영상과 정보를 가져오고 미리 preview 처럼 보여주는 함수
+void showDetailVideo(
+    {required scrape.Video selectedVideo, required BuildContext context}) {
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (context) {
+      return Container(
+        color: Theme.of(context).colorScheme.surface,
+        child: YoutubeDetailView(detailVideo: selectedVideo),
       );
     },
   );

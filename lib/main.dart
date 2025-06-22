@@ -1,3 +1,5 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
+import 'package:Vibes/services/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -46,6 +48,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
         ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
         ChangeNotifierProvider(create: (_) => PlayListState()),
+        ChangeNotifierProvider(create: (_) => AudioPlayerState()),
       ],
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
@@ -117,28 +120,107 @@ class _NavigationExampleState extends State<MainScreen> {
         centerTitle: true,
         title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
       ),
-      body: <Widget>[
-        /// 홈 스크린
-        HomeScreen(
-          onChange: () {
-            currentPageIndex = 2;
-            setState(() {});
-          },
-        ),
+      body: Stack(
+        children: [
+          <Widget>[
+            /// 홈 스크린
+            HomeScreen(
+              onChange: () {
+                currentPageIndex = 2;
+                setState(() {});
+              },
+            ),
 
-        // 음악재생 페이지
-        PlayListScreen(),
+            // 음악재생 페이지
+            PlayListScreen(),
 
-        // 검색 페이지
-        YoutubeSearchScreen(
-          streamInjection:
-              Provider.of<Youtubesearchstate>(context, listen: false)
-                  .searchResult,
-        ),
+            // 검색 페이지
+            YoutubeSearchScreen(
+              streamInjection:
+                  Provider.of<Youtubesearchstate>(context, listen: false)
+                      .searchResult,
+            ),
 
-        // 검색 페이지
-        SettingsScreen(),
-      ][currentPageIndex],
+            // 검색 페이지
+            SettingsScreen(),
+          ][currentPageIndex],
+          // 현재 페이지 인덱스에 따라 다른 위젯을 보여줍니다.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Consumer<AudioPlayerState>(
+              builder: (context, audioState, child) {
+                if (!audioState.isSongPlaying) return SizedBox.shrink();
+
+                final currentVideo = audioState.currentVideo;
+                return GestureDetector(
+                  onTap: () => showDetailAudio(
+                    selectedVideo: currentVideo,
+                    playlist: Provider.of<PlayListState>(context, listen: false)
+                        .playlist,
+                    initialIndex: 0,
+                    context: context,
+                  ),
+                  child: Container(
+                    height: 60,
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black26, blurRadius: 6),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (currentVideo != null)
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(
+                              currentVideo.thumbnailUrls?.first.toString() ??
+                                  'https://via.placeholder.com/150',
+                            ),
+                          )
+                        else
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey,
+                            child: Icon(Icons.music_note, color: Colors.white),
+                          ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            currentVideo?.title ?? "재생 중인 곡 없음",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                              audioState.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              color: Colors.black),
+                          onPressed: () => audioState.audioPlay(),
+                        ),
+                        SizedBox(width: 10),
+                        IconButton(
+                          icon: Icon(Icons.close, color: Colors.black),
+                          onPressed: () async {
+                            audioState.disposePlayer();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentPageIndex,
         onTap: (index) {

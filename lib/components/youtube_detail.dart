@@ -87,7 +87,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 25),
           ),
           Text(
-            "KLS PREVIEW",
+            "Vibes",
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           GestureDetector(

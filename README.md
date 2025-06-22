@@ -1,4 +1,4 @@
-# KLS Music
+# Vibes
 
 <div align="center">
 <img src="https://github.com/APP-iOS7/KLS-Music/blob/dev/assets/images/splash_logo.png" alt="KLS Music 로고" width="200"/>

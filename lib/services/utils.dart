@@ -42,7 +42,6 @@ void showDetailAudio({
   required VideoModel selectedVideo,
   required BuildContext context,
   List<VideoModel>? playlist,
-  int initialIndex = 0,
 }) {
   showModalBottomSheet(
     isScrollControlled: true,
@@ -52,9 +51,7 @@ void showDetailAudio({
         width: double.infinity,
         height: MediaQuery.of(context).size.height, // 앱바 높이만큼 제외
         color: Theme.of(context).colorScheme.surface,
-        child: AudioPlayerScreen(
-          currentVideo: selectedVideo,
-        ),
+        child: AudioPlayerScreen(),
       );
     },
   );

@@ -1,27 +1,32 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/utils.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class PlayListTile2 extends StatelessWidget {
   final VideoModel video;
-  final List<VideoModel> allVideos;
-  final int currentIndex;
 
-  const PlayListTile2(
-      {required this.video,
-      required this.allVideos,
-      required this.currentIndex,
-      super.key});
+  const PlayListTile2({required this.video, super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () => showDetailAudio(
-        selectedVideo: video,
-        playlist: allVideos,
-        initialIndex: currentIndex,
-        context: context,
-      ),
+      onTap: () async {
+        Provider.of<AudioPlayerState>(context, listen: false).isSongPlaying =
+            true;
+        final player =
+            Provider.of<AudioPlayerState>(context, listen: false).audioPlayer;
+        final box = Hive.box<VideoModel>('playlist');
+        final audio = box.values.firstWhere(
+          (v) => v.videoId == video.videoId, // or pass in selected video
+          orElse: () => throw Exception('Video not found in playlist'),
+        );
+
+        // 플레이어 재생
+        Provider.of<AudioPlayerState>(context, listen: false)
+            .playSoundinFile(player, audio);
+      },
       title: Text(video.title!,
           style:
               Theme.of(context).textTheme.titleLarge!.copyWith(fontSize: 16)),

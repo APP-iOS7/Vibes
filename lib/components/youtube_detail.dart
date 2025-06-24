@@ -1,9 +1,10 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:flutter/material.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/FileServices.dart';
-import 'package:kls_project/services/GlobalSnackBar.dart';
-import 'package:kls_project/services/PlayListState.dart';
-import 'package:kls_project/services/utils.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/FileServices.dart';
+import 'package:Vibes/services/GlobalSnackBar.dart';
+import 'package:Vibes/services/PlayListState.dart';
+import 'package:Vibes/services/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtube_scrape_api/models/video.dart';
@@ -22,11 +23,12 @@ class YoutubeDetailView extends StatefulWidget {
 
 class _YoutubeDetailViewState extends State<YoutubeDetailView> {
   late YoutubePlayerController _youtubePlayerController; // 유튭 동영상 controller
-  int soundVolume = 50; // 이페이지에 들어올때 soundVolume은 50으로 초기화
-
   @override
   void initState() {
     super.initState();
+
+    Provider.of<AudioPlayerState>(context, listen: false).disposePlayer();
+
     _youtubePlayerController = YoutubePlayerController(
       initialVideoId: widget.detailVideo.videoId!,
       flags: YoutubePlayerFlags(
@@ -36,21 +38,17 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
         showLiveFullscreenButton: false,
         enableCaption: false,
       ),
-    )..setVolume(soundVolume);
+    );
   }
 
   @override
   void dispose() {
     _youtubePlayerController.dispose();
     super.dispose();
-    print(_youtubePlayerController);
   }
 
   @override
   Widget build(BuildContext context) {
-    print(
-        "volume : ${_youtubePlayerController.value.volume} / sound : $soundVolume");
-
     return Padding(
       padding:
           const EdgeInsets.symmetric(vertical: kToolbarHeight, horizontal: 12),
@@ -66,11 +64,10 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
           // channel 주인 및 업로드 날짜 View
           _channelNameAndUpload(context),
           SizedBox(height: 5.0),
-          // 조회수 뷰뷰
+          // 조회수 뷰
           _detailViews(context),
-          // slider 부분
-          _customSoundSlider(),
           // 다운로드 버튼 뷰
+          SizedBox(height: 10),
           _downloadButton(context, video: widget.detailVideo),
         ],
       ),
@@ -90,7 +87,7 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 25),
           ),
           Text(
-            "KLS PREVIEW",
+            "Vibes",
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           GestureDetector(
@@ -153,33 +150,6 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
     );
   }
 
-  Row _customSoundSlider() {
-    return Row(
-      children: [
-        Icon(Icons.volume_down),
-        Expanded(
-          child: Slider(
-            // 볼륨 값 (0~100을 0~1로 변환해서 사용)
-            value: (soundVolume / 100).toDouble(),
-            min: 0.0,
-            max: 1.0,
-            onChanged: (value) {
-              // 소수 값 (0~1)을 다시 0~100 정수로 변환하여 볼륨 설정
-              setState(() {
-                soundVolume = (value * 100).toInt();
-                _youtubePlayerController.setVolume(soundVolume);
-              });
-            },
-            activeColor: Theme.of(context).sliderTheme.activeTrackColor,
-            inactiveColor: Colors.grey,
-            thumbColor: Colors.red,
-          ),
-        ),
-        Icon(Icons.volume_up),
-      ],
-    );
-  }
-
   Row _channelNameAndUpload(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -203,11 +173,11 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
     );
   }
 
-  Expanded _downloadButton(BuildContext context, {required Video video}) {
-    return Expanded(
-      child: SizedBox(
-        width: double.infinity,
-        child: ElevatedButton(
+  Row _downloadButton(BuildContext context, {required Video video}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
           onPressed: () {
             // VideoModel 객체 생성
             final selectedVideo = VideoModel(
@@ -257,15 +227,10 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
               }
             });
           },
-          child: Text(
-            "다운로드",
-            style: Theme.of(context)
-                .textTheme
-                .displayLarge!
-                .copyWith(color: Colors.white),
-          ),
+          icon: Icon(Icons.download),
         ),
-      ),
+        IconButton(onPressed: () {}, icon: Icon(Icons.share_rounded))
+      ],
     );
   }
 }

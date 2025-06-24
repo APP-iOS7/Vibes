@@ -1,8 +1,8 @@
-name: kls_project
-description: "A new Flutter project."
+name: Vibes
+description: "A simple YouTube music player app for Android and iOS."
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.1
 
 environment:
   sdk: ^3.6.0
@@ -12,7 +12,6 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
-  smooth_page_indicator: ^1.2.1
   youtube_explode_dart: ^2.3.10
   youtube_player_flutter: ^9.1.1
   just_audio: ^0.9.46

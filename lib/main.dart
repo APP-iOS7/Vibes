@@ -1,20 +1,21 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
+import 'package:Vibes/services/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:kls_project/model/ChangeThemeMode.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/screen/HomeScreen.dart';
-import 'package:kls_project/screen/PlayListScreen.dart';
-import 'package:kls_project/screen/SettingsScreen.dart';
-import 'package:kls_project/screen/YoutubeSearchScreen.dart';
-import 'package:kls_project/services/GlobalSnackBar.dart';
-import 'package:kls_project/screen/dopeScreen.dart';
-import 'package:kls_project/services/PlayListState.dart';
-import 'package:kls_project/services/YoutubeSearchState.dart';
-import 'package:kls_project/theme/theme.dart';
-import 'package:kls_project/viewModel/theme_initialze.dart';
+import 'package:Vibes/model/ChangeThemeMode.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/screen/HomeScreen.dart';
+import 'package:Vibes/screen/PlayListScreen.dart';
+import 'package:Vibes/screen/SettingsScreen.dart';
+import 'package:Vibes/screen/YoutubeSearchScreen.dart';
+import 'package:Vibes/services/GlobalSnackBar.dart';
+import 'package:Vibes/services/PlayListState.dart';
+import 'package:Vibes/services/YoutubeSearchState.dart';
+import 'package:Vibes/theme/theme.dart';
+import 'package:Vibes/components/theme_initialze.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -25,14 +26,7 @@ void main() async {
 
   Hive.registerAdapter(VideoModelAdapter());
   await Hive.openBox<VideoModel>('playlist');
-  var tutorialBox = await Hive.openBox<bool>('isTutorial');
-  // 앱을 처음 실행하면 true 아니면 false
-  bool isFirstRun = tutorialBox.get('isTutorial', defaultValue: false) == false;
 
-  // 다음 실행때는 나오지 않도록 값을 넣어줍니다.
-  if (isFirstRun) {
-    await tutorialBox.put('isTutorial', true);
-  }
   // 백그라운드 재생을 위한 초기화
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
@@ -46,13 +40,12 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChangeThemeMode()),
         ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
         ChangeNotifierProvider(create: (_) => PlayListState()),
+        ChangeNotifierProvider(create: (_) => AudioPlayerState()),
       ],
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다
         child: Consumer<ChangeThemeMode>(
-          builder: (context, changeMode, child) => PageRouteSelection(
-            isFirstRun: isFirstRun, // isFirstRun을 전달 해줍니다.
-          ),
+          builder: (context, changeMode, child) => PageRouteSelection(),
         ),
       ),
     ),
@@ -60,40 +53,28 @@ void main() async {
 }
 
 class PageRouteSelection extends StatefulWidget {
-  final bool isFirstRun;
-  const PageRouteSelection({required this.isFirstRun, super.key});
+  const PageRouteSelection({super.key});
 
   @override
   State<PageRouteSelection> createState() => _NavigationBarAppState();
 }
 
 class _NavigationBarAppState extends State<PageRouteSelection> {
-  bool isFirstRun = false; // 부모에게 받기 위한 상태변수
-
   @override
   void initState() {
     super.initState();
     FlutterNativeSplash.remove(); // 한곳에서 SplashScreen을 닫게 합니다.
-    isFirstRun = widget.isFirstRun;
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KSL MUSIC',
+      title: 'Vibes',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ChangeThemeMode>(context).themeData,
       // 글로벌 ScaffoldMessenger 키 설정
       scaffoldMessengerKey: GlobalSnackBar.key,
-      home: isFirstRun
-          ? DopeScreen(
-              nextMainPage: () {
-                setState(() {
-                  isFirstRun = !isFirstRun;
-                });
-              },
-            )
-          : MainScreen(),
+      home: MainScreen(),
     );
   }
 }
@@ -107,7 +88,7 @@ class MainScreen extends StatefulWidget {
 
 class _NavigationExampleState extends State<MainScreen> {
   int currentPageIndex = 0;
-  String titleName = "KLS MUSIC";
+  String titleName = "Vibes";
 
   @override
   Widget build(BuildContext context) {
@@ -117,28 +98,107 @@ class _NavigationExampleState extends State<MainScreen> {
         centerTitle: true,
         title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
       ),
-      body: <Widget>[
-        /// 홈 스크린
-        HomeScreen(
-          onChange: () {
-            currentPageIndex = 2;
-            setState(() {});
-          },
-        ),
+      body: Stack(
+        children: [
+          <Widget>[
+            /// 홈 스크린
+            HomeScreen(
+              onChange: () {
+                currentPageIndex = 2;
+                setState(() {});
+              },
+            ),
 
-        // 음악재생 페이지
-        PlayListScreen(),
+            // 음악재생 페이지
+            PlayListScreen(),
 
-        // 검색 페이지
-        YoutubeSearchScreen(
-          streamInjection:
-              Provider.of<Youtubesearchstate>(context, listen: false)
-                  .searchResult,
-        ),
+            // 검색 페이지
+            YoutubeSearchScreen(
+              streamInjection:
+                  Provider.of<Youtubesearchstate>(context, listen: false)
+                      .searchResult,
+            ),
 
-        // 검색 페이지
-        SettingsScreen(),
-      ][currentPageIndex],
+            // 검색 페이지
+            SettingsScreen(),
+          ][currentPageIndex],
+          // 현재 페이지 인덱스에 따라 다른 위젯을 보여줍니다.
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Consumer<AudioPlayerState>(
+              builder: (context, audioState, child) {
+                if (!audioState.isSongPlaying) return SizedBox.shrink();
+                // 현재 비디오 및 index 가져오기
+                final currentVideo = audioState.currentVideo;
+                audioState.getCurrentIndex(context);
+
+                return GestureDetector(
+                  onTap: () => showDetailAudio(
+                    selectedVideo: currentVideo,
+                    playlist: Provider.of<PlayListState>(context, listen: false)
+                        .playlist,
+                    context: context,
+                  ),
+                  child: Container(
+                    height: 60,
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black26, blurRadius: 6),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (currentVideo != null)
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundImage: NetworkImage(
+                              currentVideo.thumbnailUrls?.first.toString() ??
+                                  'https://via.placeholder.com/150',
+                            ),
+                          )
+                        else
+                          CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.grey,
+                            child: Icon(Icons.music_note, color: Colors.white),
+                          ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            currentVideo?.title ?? "재생 중인 곡 없음",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                              audioState.isPlaying
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
+                              color: Colors.black),
+                          onPressed: () => audioState.audioPlay(),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close, color: Colors.black),
+                          onPressed: () async {
+                            audioState.disposePlayer();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentPageIndex,
         onTap: (index) {
@@ -158,7 +218,7 @@ class _NavigationExampleState extends State<MainScreen> {
                   break;
               }
             } else {
-              titleName = "KLS MUSIC";
+              titleName = "Vibes";
             }
           });
         },

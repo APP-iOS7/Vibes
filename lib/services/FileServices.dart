@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:kls_project/model/VideoModel.dart';
+import 'package:Vibes/model/VideoModel.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -24,7 +24,7 @@ class FileServices {
 
   // 파일경로 getter
   File _getFile({required String docPath, required String videoId}) {
-    return File('$docPath/$videoId.mp4');
+    return File('$docPath/$videoId.mp3');
   }
 
   static FileServices get instance => _instance;
@@ -68,7 +68,7 @@ class FileServices {
     // 앱 전용 저장소 경로 가져오기
     var directory = await getApplicationDocumentsDirectory();
     // 읽을 파일 경로
-    var filePath = File('${directory.path}/$videoId.mp4');
+    var filePath = File('${directory.path}/$videoId.mp3');
     // 파일 존재 여부 확인
     return filePath.exists();
   }
@@ -78,7 +78,7 @@ class FileServices {
     var directory = await getApplicationDocumentsDirectory();
 
     // 읽을 파일 경로
-    var filePath = '${directory.path}/$videoId.mp4';
+    var filePath = '${directory.path}/$videoId.mp3';
     print(filePath);
     // 파일 존재 여부 확인
     var file = File(filePath);
@@ -100,7 +100,7 @@ class FileServices {
     var directory = await getApplicationDocumentsDirectory();
 
     // 읽을 파일 경로
-    var filePath = '${directory.path}/audio.mp4';
+    var filePath = '${directory.path}/audio.mp3';
 
     // 파일 존재 여부 확인
     var file = File(filePath);
@@ -135,7 +135,7 @@ class FileServices {
     var directory = await getApplicationDocumentsDirectory();
 
     // 읽을 파일 경로
-    var filePath = '${directory.path}/audio.mp4';
+    var filePath = '${directory.path}/audio.mp3';
 
     // 파일 존재 여부 확인
     var file = File(filePath);

@@ -1,9 +1,10 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:kls_project/model/VideoModel.dart';
-import 'package:kls_project/services/PlayListState.dart';
-import 'package:kls_project/viewModel/play_list_tile2.dart';
+import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/PlayListState.dart';
+import 'package:Vibes/components/play_list_tile2.dart';
 import 'package:provider/provider.dart';
 
 class PlayListScreen extends StatelessWidget {
@@ -17,9 +18,11 @@ class PlayListScreen extends StatelessWidget {
           if (playListState.playlist.isEmpty) {
             // 플레이 리스트가 비어있다면
             return Center(
-              child: Text(
-                "플레이 리스트를 추가해 주세요 :( ",
-                style: Theme.of(context).textTheme.bodySmall,
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.asset(
+                  "assets/images/noPlayList.png",
+                ),
               ),
             );
           }
@@ -29,7 +32,6 @@ class PlayListScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               VideoModel music = playListState.playlist[index];
               // 플레이리스트 데이터는 PlayListState에서 가져옴
-              List<VideoModel> allVideos = playListState.playlist;
 
               return Slidable(
                 endActionPane: ActionPane(
@@ -38,7 +40,7 @@ class PlayListScreen extends StatelessWidget {
                   children: [
                     SlidableAction(
                       onPressed: (BuildContext context) =>
-                          playListState.deletePlayList(music.videoId!),
+                          playListState.deletePlayList(context, music.videoId!),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       icon: Icons.delete_forever,
@@ -46,11 +48,8 @@ class PlayListScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                // child: PlayListTile2(video: music),
                 child: PlayListTile2(
                   video: music,
-                  allVideos: allVideos, // 전체 플레이리스트 전달
-                  currentIndex: index, // 현재 인덱스 전달
                 ),
               );
             },

@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
   VoidCallback onChange;
   HomeScreen({required this.onChange, super.key});
@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Text(
-            "KLS MUSIC에 오신걸 환영합니다",
+            "Vibes에 오신걸 환영합니다",
             style: Theme.of(context).textTheme.titleLarge,
           ),
           SizedBox(height: 10),

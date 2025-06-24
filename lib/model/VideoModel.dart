@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:youtube_scrape_api/models/thumbnail.dart';
 
 part 'VideoModel.g.dart';
 

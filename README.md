@@ -1,13 +1,13 @@
 # Vibes
 
 <div align="center">
-<img src="https://github.com/APP-iOS7/KLS-Music/blob/dev/assets/images/splash_logo.png" alt="KLS Music 로고" width="200"/>
+<img src="https://github.com/APP-iOS7/KLS-Music/blob/dev/assets/images/splash_logo.png" alt="Vibes 로고" width="200"/>
 <p><em>무료 유튜브 기반 음악 스트리밍 애플리케이션</em></p>
 </div>
 
 ## 📝 프로젝트 동기
 
-KLS Music은 스포티파이나 멜론과 같은 비싼 스트리밍 서비스에 대한 대안으로 만들어졌습니다. 많은 사람들이 이미 유튜브 플레이리스트로 음악을 듣고 있기 때문에, 유튜브를 음원으로 활용하는 전용 음악 플레이어 앱을 개발했습니다. 이를 통해 사용자들은 비싼 구독료 없이 좋아하는 음악을 즐길 수 있습니다.
+Vibes는 스포티파이나 멜론과 같은 비싼 스트리밍 서비스에 대한 대안으로 만들어졌습니다. 많은 사람들이 이미 유튜브 플레이리스트로 음악을 듣고 있기 때문에, 유튜브를 음원으로 활용하는 전용 음악 플레이어 앱을 개발했습니다. 이를 통해 사용자들은 비싼 구독료 없이 좋아하는 음악을 즐길 수 있습니다.
 
 ## 🛠️ 프로젝트 구성
 
@@ -39,8 +39,8 @@ lib/
 1. 저장소 복제하기
 
 ```bash
-git clone https://github.com/yourusername/kls_project.git
-cd kls_project
+git clone https://github.com/yourusername/Vibes.git
+cd Vibes
 ```
 
 2. 의존성 설치하기
@@ -74,8 +74,8 @@ flutter run
 <table>
 <tr>
     <td align="center">
-    <a href="https://github.com/developer1">
-        <img src="https://via.placeholder.com/100" width="100px;" alt="개발자 1"/>
+    <a href="https://github.com/Kimyonhae">
+        <img src="https://github.com/user-attachments/assets/d5467a10-b2db-4efd-aba8-70d504121877" width="100px;" alt="김용해"/>
         <br />
         <sub><b>김용해</b></sub>
     </a>
@@ -83,8 +83,8 @@ flutter run
     <sub>기획 & 개발</sub>
     </td>
     <td align="center">
-    <a href="https://github.com/developer2">
-        <img src="https://via.placeholder.com/100" width="100px;" alt="개발자 2"/>
+    <a href="https://github.com/Hyuk">
+        <img src="https://github.com/user-attachments/assets/f3d300e8-eb76-4cf4-b031-09ff50851d53" width="100px;" alt="송혁호"/>
         <br />
         <sub><b>송혁호</b></sub>
     </a>
@@ -92,8 +92,8 @@ flutter run
     <sub>개발 & 디자인</sub>
     </td>
     <td align="center">
-    <a href="https://github.com/developer3">
-        <img src="https://via.placeholder.com/100" width="100px;" alt="개발자 3"/>
+    <a href="https://github.com/LSH89-Ligardo">
+        <img src="https://github.com/user-attachments/assets/413ae551-be2c-451a-a052-2d4f2635272f" width="100px;" alt="LSH"/>
         <br />
         <sub><b>이성훈</b></sub>
     </a>
@@ -105,7 +105,7 @@ flutter run
 
 ## 🐛 버그 및 디버그
 
-애플리케이션 사용 중 버그나 문제가 발생하면 [이슈 트래커](https://github.com/yourusername/kls_project/issues)를 통해 제보해 주세요. 버그 리포트 제출 시 다음 사항을 포함해 주세요:
+애플리케이션 사용 중 버그나 문제가 발생하면 [이슈 트래커](https://github.com/APP-iOS7/Vibes/issues)를 통해 제보해 주세요. 버그 리포트 제출 시 다음 사항을 포함해 주세요:
 
 - 문제에 대한 자세한 설명
 - 버그를 재현하는 단계
@@ -114,7 +114,7 @@ flutter run
 
 ## 🔄 버전 및 업데이트 정보
 
-**현재 버전:** 1.0.0
+**현재 버전:** 1.0.1
 
 ### 기능:
 
@@ -124,19 +124,11 @@ flutter run
 - 백그라운드 재생 기능
 - 플레이리스트 생성
 - 노래 및 유튜버 검색
-- 첫 실행 튜토리얼
-
-## ⭐ UPDATE 예정 기능
-
-- 이퀄라이저 설정
-- 오디오 시각화
-- Search API 무한 스크롤
-- 커스텀 플레이리스트 생성 및 관리
 
 ## ❓ 자주 묻는 질문 (FAQ)
 
 **Q: 이 앱을 사용하는 것이 합법적인가요?**
-A: KLS Music은 사용자가 YouTube에서 제공하는 공개 콘텐츠에 접근할 수 있도록 합니다. 그러나 콘텐츠 이용 방식은 사용자의 책임이며, 지역 저작권법 및 YouTube 이용 약관을 준수해야 합니다.
+A: Vibes는 사용자가 YouTube에서 제공하는 공개 콘텐츠에 접근할 수 있도록 합니다. 그러나 콘텐츠 이용 방식은 사용자의 책임이며, 지역 저작권법 및 YouTube 이용 약관을 준수해야 합니다.
 
 **Q: 앱은 인터넷 연결이 필요한가요?**
 A: 음악을 검색하고 다운로드하려면 인터넷 연결이 필요합니다. 다운로드된 노래는 오프라인에서 재생할 수 있습니다.
@@ -148,7 +140,7 @@ A: 네, 이 앱은 Flutter로 개발되어 Android와 iOS 플랫폼 모두에서
 A: 이 앱은 JustAudioBackground 패키지를 사용하여 앱이 포그라운드에 없을 때도 연속 재생을 제공합니다.
 
 **Q: 내 데이터가 공유되거나 수집되나요?**
-A: KLS Music은 개인 데이터를 수집하거나 공유하지 않습니다. 모든 음악은 기기에 로컬로 저장됩니다.
+A: Vibes는 개인 데이터를 수집하거나 공유하지 않습니다. 모든 음악은 기기에 로컬로 저장됩니다.
 
 ## 📄 라이선스
 
@@ -157,5 +149,5 @@ A: KLS Music은 개인 데이터를 수집하거나 공유하지 않습니다. �
 ---
 
 <div align="center">
-멋쟁이사자 IOS7기 KLS Music 팀이 ❤️로 만들었습니다
+멋쟁이사자 IOS7기 Vibes 팀이 ❤️로 만들었습니다
 </div>

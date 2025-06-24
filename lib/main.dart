@@ -69,7 +69,7 @@ class _NavigationBarAppState extends State<PageRouteSelection> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'KSL MUSIC',
+      title: 'Vibes',
       debugShowCheckedModeBanner: false,
       theme: Provider.of<ChangeThemeMode>(context).themeData,
       // 글로벌 ScaffoldMessenger 키 설정
@@ -88,7 +88,7 @@ class MainScreen extends StatefulWidget {
 
 class _NavigationExampleState extends State<MainScreen> {
   int currentPageIndex = 0;
-  String titleName = "KLS MUSIC";
+  String titleName = "Vibes";
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +218,7 @@ class _NavigationExampleState extends State<MainScreen> {
                   break;
               }
             } else {
-              titleName = "KLS MUSIC";
+              titleName = "Vibes";
             }
           });
         },

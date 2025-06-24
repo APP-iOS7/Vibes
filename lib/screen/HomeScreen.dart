@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Text(
-            "KLS MUSIC에 오신걸 환영합니다",
+            "Vibes에 오신걸 환영합니다",
             style: Theme.of(context).textTheme.titleLarge,
           ),
           SizedBox(height: 10),

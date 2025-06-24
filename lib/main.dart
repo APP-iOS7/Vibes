@@ -184,7 +184,6 @@ class _NavigationExampleState extends State<MainScreen> {
                               color: Colors.black),
                           onPressed: () => audioState.audioPlay(),
                         ),
-                        SizedBox(width: 10),
                         IconButton(
                           icon: Icon(Icons.close, color: Colors.black),
                           onPressed: () async {

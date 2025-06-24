@@ -209,21 +209,21 @@ class _YoutubeDetailViewState extends State<YoutubeDetailView> {
                   ),
                 );
 
+                // 뒤로 가기  <- 바텀시트
+                Navigator.of(context).pop();
+
                 // 오디오 다운로드
                 FileServices.instance
                     .downloadVideo(video: selectedVideo)
                     .then((_) {
-                  // playlist 저장
-                  Provider.of<PlayListState>(context, listen: false)
-                      .createPlayList(selectedVideo);
                   GlobalSnackBar.show('다운로드가 완료되었습니다!', isSuccess: true);
-
-                  // 뒤로 가기  <- 바텀시트
-                  Navigator.of(context).pop();
                 }).catchError((error) {
-                  print('에러 발생: $error');
                   GlobalSnackBar.show('다운로드 중 오류가 발생했습니다.', isSuccess: false);
                 });
+
+                // playlist 저장
+                Provider.of<PlayListState>(context, listen: false)
+                    .createPlayList(selectedVideo);
               }
             });
           },

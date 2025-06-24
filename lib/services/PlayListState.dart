@@ -1,7 +1,9 @@
+import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:Vibes/model/VideoModel.dart';
 import 'package:Vibes/services/FileServices.dart';
+import 'package:provider/provider.dart';
 
 class PlayListState extends ChangeNotifier {
   final Box<VideoModel> _playlistBox = Hive.box<VideoModel>("playlist");
@@ -37,7 +39,14 @@ class PlayListState extends ChangeNotifier {
   }
 
   // delete 과정  CRUD -> Delete
-  Future<void> deletePlayList(String videoId) async {
+  Future<void> deletePlayList(BuildContext context, String videoId) async {
+    final VideoModel currentVideo =
+        Provider.of<AudioPlayerState>(context, listen: false).currentVideo;
+    // 삭제시 해당 음악이 틀어져 있다면 종료
+    if (currentVideo.videoId == videoId) {
+      Provider.of<AudioPlayerState>(context, listen: false).disposePlayer();
+    }
+
     _playlist.removeWhere((element) => element.videoId == videoId);
 
     //Hive DB에 videoID를 식별자로 사용하여 삭제

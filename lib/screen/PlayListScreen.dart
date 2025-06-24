@@ -40,7 +40,7 @@ class PlayListScreen extends StatelessWidget {
                   children: [
                     SlidableAction(
                       onPressed: (BuildContext context) =>
-                          playListState.deletePlayList(music.videoId!),
+                          playListState.deletePlayList(context, music.videoId!),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       icon: Icons.delete_forever,

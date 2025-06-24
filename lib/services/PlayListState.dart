@@ -52,7 +52,7 @@ class PlayListState extends ChangeNotifier {
     //Hive DB에 videoID를 식별자로 사용하여 삭제
     await _playlistBox.delete(videoId);
 
-    // 파일 경로에 있는 mp4 파일 삭제도 해야 합니다.
+    // 파일 경로에 있는 mp3 파일 삭제도 해야 합니다.
     await FileServices.instance.deleteVideo(videoId: videoId);
     notifyListeners();
   }

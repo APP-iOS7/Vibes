@@ -123,7 +123,7 @@ class AudioPlayerState with ChangeNotifier {
     var directory = await getApplicationDocumentsDirectory();
 
     // 읽을 파일 경로
-    var filePath = '${directory.path}/${video.videoId}.mp4';
+    var filePath = '${directory.path}/${video.videoId}.mp3';
 
     // 파일 존재 여부 확인
     var file = File(filePath);

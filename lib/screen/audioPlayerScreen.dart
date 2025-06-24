@@ -140,7 +140,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   progress: position,
                   total: totalDuration,
                   timeLabelLocation: TimeLabelLocation.sides,
-                  onSeek: (duration) => {},
+                  onSeek: (duration) =>
+                      Provider.of<AudioPlayerState>(context, listen: false)
+                          .sliderControls(duration),
                 ),
               );
             },
@@ -208,7 +210,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             ),
           ),
           GestureDetector(
-            onTap: () => audioState.shuffleSet(),
+            onTap: () => audioState.shuffleSet(context),
             child: Icon(
               Icons.shuffle,
               color: audioState.isShuffling

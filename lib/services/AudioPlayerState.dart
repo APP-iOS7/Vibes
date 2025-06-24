@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:Vibes/model/VideoModel.dart';
 import 'package:Vibes/services/PlayListState.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -40,6 +41,8 @@ class AudioPlayerState with ChangeNotifier {
   Duration _totalDuration = Duration.zero;
   Duration get totalDuration => _totalDuration;
 
+  StreamSubscription<PlayerState>? _playSubscription;
+
   AudioPlayerState() {
     // 상태 변화 리스너 등록
     _audioPlayer.playerStateStream.listen((state) {
@@ -63,6 +66,12 @@ class AudioPlayerState with ChangeNotifier {
   void loopSet() {
     _isLooping = !_isLooping;
     if (_isLooping) {
+      // 셔플 켜져 있으면 끄기
+      if (_isShuffling) {
+        _isShuffling = false;
+        _playSubscription?.cancel();
+      }
+
       audioPlayer.setLoopMode(LoopMode.one);
     } else {
       audioPlayer.setLoopMode(LoopMode.off);
@@ -71,12 +80,38 @@ class AudioPlayerState with ChangeNotifier {
   }
 
   // 셔플 기능의 토글 함수
-  void shuffleSet() {
+  void shuffleSet(BuildContext context) {
     _isShuffling = !_isShuffling;
     if (_isShuffling) {
-      print("셔플이 가능한 상태 입니다");
+      // 루프 켜져 있으면 끄기
+      if (_isLooping) {
+        _isLooping = false;
+        audioPlayer.setLoopMode(LoopMode.off);
+      }
+
+      // 총 노래의 개수
+      final playListCount =
+          Provider.of<PlayListState>(context, listen: false).playlist.length;
+      // playList의 length만큼 배열을 생성
+      final shuffleList = List.generate(
+          playListCount,
+          (index) => Provider.of<PlayListState>(context, listen: false)
+              .playlist[index]);
+
+      // 혹시 있으면 없애고 listen 생성
+      _playSubscription?.cancel();
+      _playSubscription = _audioPlayer.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed) {
+          //  shuffleList 랜덤 돌리기
+          final randomIndex = Random().nextInt(shuffleList.length);
+          final selectedMusic = shuffleList[randomIndex];
+
+          // 곡이 끝났을 때
+          playSoundinFile(_audioPlayer, selectedMusic);
+        }
+      });
     } else {
-      print("셔플이 가능한 비활성 상태 입니다");
+      _playSubscription?.cancel();
     }
     notifyListeners();
   }
@@ -146,11 +181,15 @@ class AudioPlayerState with ChangeNotifier {
 
   /// 해제
   void disposePlayer() async {
-    await _audioPlayer.stop();
-    await _audioPlayer.setAudioSource(ConcatenatingAudioSource(children: []));
     _isPlaying = false;
+    _isLooping = false;
+    _isShuffling = false;
     _currentVideo = null;
     isSongPlaying = false; // 하단 재생 바 여부
+    _audioPlayer.setLoopMode(LoopMode.off);
+    _playSubscription?.cancel();
+    await _audioPlayer.stop();
+    await _audioPlayer.setAudioSource(ConcatenatingAudioSource(children: []));
     notifyListeners();
   }
 
@@ -176,9 +215,16 @@ class AudioPlayerState with ChangeNotifier {
       final video = Provider.of<PlayListState>(context, listen: false)
           .playlist[currentIndex];
       _currentVideo = video;
+    } else {
+      return;
     }
-
     playSoundinFile(_audioPlayer, _currentVideo!);
+    notifyListeners();
+  }
+
+  // Slider bar 컨트롤러 함수
+  void sliderControls(Duration duration) {
+    _audioPlayer.seek(duration);
     notifyListeners();
   }
 }

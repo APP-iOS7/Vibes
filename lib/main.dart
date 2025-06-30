@@ -14,6 +14,7 @@ import 'package:Vibes/screen/YoutubeSearchScreen.dart';
 import 'package:Vibes/services/GlobalSnackBar.dart';
 import 'package:Vibes/services/PlayListState.dart';
 import 'package:Vibes/services/YoutubeSearchState.dart';
+import 'package:Vibes/services/YoutubeMusicChartState.dart';
 import 'package:Vibes/theme/theme.dart';
 import 'package:Vibes/components/theme_initialze.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => Youtubesearchstate()),
         ChangeNotifierProvider(create: (_) => PlayListState()),
         ChangeNotifierProvider(create: (_) => AudioPlayerState()),
+        ChangeNotifierProvider(create: (_) => YoutubeMusicChartState()),
       ],
       child: ThemeInitialze(
         // ThemeInitialze 커스텀 위젯을 통해 Theme 테마 가져옵니다

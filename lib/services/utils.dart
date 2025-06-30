@@ -72,6 +72,32 @@ void showDetailVideo(
   );
 }
 
+// VideoModel로부터 상세한 비디오 정보를 보여주는 함수
+void showDetailVideoFromModel(
+    {required VideoModel selectedVideo, required BuildContext context}) {
+  // VideoModel을 scrape.Video로 변환
+  final scrapeVideo = scrape.Video(
+    videoId: selectedVideo.videoId ?? '',
+    title: selectedVideo.title ?? '',
+    channelName: selectedVideo.channelName ?? '',
+    duration: selectedVideo.duration ?? '',
+    views: selectedVideo.views ?? '',
+    uploadDate: selectedVideo.uploadDate ?? '',
+    thumbnails: selectedVideo.thumbnailUrls?.map((url) => Thumbnail(url: url)).toList() ?? [],
+  );
+
+  showModalBottomSheet(
+    isScrollControlled: true,
+    context: context,
+    builder: (context) {
+      return Container(
+        color: Theme.of(context).colorScheme.surface,
+        child: YoutubeDetailView(detailVideo: scrapeVideo),
+      );
+    },
+  );
+}
+
 // Thumnail 직렬화 함수
 List<String> convertThumnailURL(List<Thumbnail> data) {
   return data.map((thumnail) => thumnail.url.toString()).toList();

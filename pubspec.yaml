@@ -25,6 +25,7 @@ dependencies:
   hive_flutter: ^1.1.0
   audio_video_progress_bar: ^2.0.3
   flutter_native_splash: ^2.4.5
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

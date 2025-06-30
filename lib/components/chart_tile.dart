@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Vibes/model/VideoModel.dart';
+import 'package:Vibes/services/utils.dart';
 
 class ChartTile extends StatelessWidget {
   final VideoModel video;
@@ -15,24 +16,15 @@ class ChartTile extends StatelessWidget {
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
       ),
-      subtitle: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              video.uploadDate ?? '',
-              overflow: TextOverflow.ellipsis,
-            ),
+      subtitle: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          formatViewCount(video.views),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.secondary,
           ),
-          SizedBox(width: 5.0),
-          Expanded(
-            flex: 2,
-            child: Text(
-              video.views ?? '',
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       leading: Stack(
         children: [
@@ -80,11 +72,6 @@ class ChartTile extends StatelessWidget {
               ),
             ),
         ],
-      ),
-      trailing: Icon(
-        Icons.play_circle_outline,
-        color: Theme.of(context).colorScheme.primary,
-        size: 32,
       ),
     );
   }

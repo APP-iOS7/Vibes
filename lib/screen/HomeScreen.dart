@@ -49,15 +49,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             Text(
                               "YouTube Music",
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                             Text(
                               "Vibes로 음악을 즐겨보세요",
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
                             ),
                           ],
                         ),
@@ -65,7 +72,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       GestureDetector(
                         onTap: widget.onChange,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: Theme.of(context).colorScheme.primary,
@@ -75,18 +83,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Text(
                             "검색",
-                            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.primary),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall!
+                                .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 Divider(height: 1, thickness: 0.5),
-                
+
                 // 차트 리스트
                 Expanded(
                   child: _buildChartContent(chartState),
@@ -109,7 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 16),
             Text(
               "인기차트를 불러오는 중...",
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
           ],
         ),
@@ -175,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         // 섹션 타이틀
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 4),
           child: Row(
             children: [
               Icon(
@@ -187,68 +201,76 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "실시간 인기차트",
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
               ),
             ],
           ),
         ),
-        
+
         // 차트 리스트
         Expanded(
           child: ListView.separated(
             padding: EdgeInsets.symmetric(vertical: 8),
             itemCount: chartState.chartVideos.length,
-      separatorBuilder: (context, index) => Divider(
-        height: 1,
-        thickness: 0.5,
-        indent: 16,
-        endIndent: 16,
-        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
-      ),
-      itemBuilder: (context, index) {
-        final VideoModel video = chartState.chartVideos[index];
-        return GestureDetector(
-          onTap: () {
-            showDetailVideoFromModel(selectedVideo: video, context: context);
-          },
-          child: Row(
-            children: [
-              // 순위 표시
-              Padding(
-                padding: EdgeInsets.only(left: 14, right: 12),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: index < 3 
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${index + 1}',
-                      style: TextStyle(
-                        color: index < 3 
-                            ? Colors.white 
-                            : Theme.of(context).colorScheme.onSurface,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
+            separatorBuilder: (context, index) => Divider(
+              height: 1,
+              thickness: 0.5,
+              indent: 16,
+              endIndent: 16,
+              color: Theme.of(context)
+                  .colorScheme
+                  .secondary
+                  .withValues(alpha: 0.3),
+            ),
+            itemBuilder: (context, index) {
+              final VideoModel video = chartState.chartVideos[index];
+              return GestureDetector(
+                onTap: () {
+                  showDetailVideoFromModel(
+                      selectedVideo: video, context: context);
+                },
+                child: Row(
+                  children: [
+                    // 순위 표시
+                    Padding(
+                      padding: EdgeInsets.only(left: 14, right: 2),
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: index < 3
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .secondary
+                                  .withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${index + 1}',
+                            style: TextStyle(
+                              color: index < 3
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.onSurface,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    // 차트 타일
+                    Expanded(
+                      child: ChartTile(video: video),
+                    ),
+                  ],
                 ),
-              ),
-              // 차트 타일
-              Expanded(
-                child: ChartTile(video: video),
-              ),
-            ],
+              );
+            },
           ),
-        );
-      },
-    ),
         ),
       ],
     );

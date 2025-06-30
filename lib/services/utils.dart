@@ -98,6 +98,38 @@ void showDetailVideoFromModel(
   );
 }
 
+// 조회수를 만 단위로 포맷팅하는 함수 (1만 미만은 표시하지 않음)
+String formatViewCount(String? viewCount) {
+  if (viewCount == null || viewCount.isEmpty) return '';
+  
+  // 숫자가 아닌 문자 제거하고 숫자만 추출
+  String numericString = viewCount.replaceAll(RegExp(r'[^0-9]'), '');
+  
+  if (numericString.isEmpty) return '';
+  
+  try {
+    int views = int.parse(numericString);
+    
+    // 1만 미만은 표시하지 않음
+    if (views < 10000) return '';
+    
+    // 1억 이상
+    if (views >= 100000000) {
+      double billions = views / 100000000;
+      return '${billions.toStringAsFixed(1).replaceAll('.0', '')}억';
+    }
+    // 1만 이상
+    else if (views >= 10000) {
+      double tenThousands = views / 10000;
+      return '${tenThousands.toStringAsFixed(1).replaceAll('.0', '')}만';
+    }
+    
+    return '';
+  } catch (e) {
+    return '';
+  }
+}
+
 // Thumnail 직렬화 함수
 List<String> convertThumnailURL(List<Thumbnail> data) {
   return data.map((thumnail) => thumnail.url.toString()).toList();

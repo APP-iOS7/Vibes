@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:Vibes/model/VideoModel.dart';
 import 'package:Vibes/services/YoutubeMusicChartState.dart';
 import 'package:Vibes/services/utils.dart';
-import 'package:Vibes/components/chart_tile.dart';
+import 'package:Vibes/components/horizontal_chart_tile.dart';
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
@@ -101,7 +101,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // 차트 리스트
                 Expanded(
-                  child: _buildChartContent(chartState),
+                  child: SingleChildScrollView(
+                    child: _buildChartContent(chartState),
+                  ),
                 ),
               ],
             ),
@@ -161,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            SizedBox(
               width: 200,
               height: 200,
               child: Image.asset(
@@ -186,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // 섹션 타이틀
         Padding(
@@ -209,69 +212,29 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
-        // 차트 리스트
-        Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(vertical: 8),
+        // 차트 리스트 (가로 스크롤)
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             itemCount: chartState.chartVideos.length,
-            separatorBuilder: (context, index) => Divider(
-              height: 1,
-              thickness: 0.5,
-              indent: 16,
-              endIndent: 16,
-              color: Theme.of(context)
-                  .colorScheme
-                  .secondary
-                  .withValues(alpha: 0.3),
-            ),
             itemBuilder: (context, index) {
               final VideoModel video = chartState.chartVideos[index];
-              return GestureDetector(
+              return HorizontalChartTile(
+                video: video,
+                ranking: index + 1,
                 onTap: () {
                   showDetailVideoFromModel(
                       selectedVideo: video, context: context);
                 },
-                child: Row(
-                  children: [
-                    // 순위 표시
-                    Padding(
-                      padding: EdgeInsets.only(left: 14, right: 2),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: index < 3
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .secondary
-                                  .withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '${index + 1}',
-                            style: TextStyle(
-                              color: index < 3
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // 차트 타일
-                    Expanded(
-                      child: ChartTile(video: video),
-                    ),
-                  ],
-                ),
               );
             },
           ),
         ),
+        
+        // 추가 공간 (향후 다른 섹션 추가 가능)
+        SizedBox(height: 20),
       ],
     );
   }

@@ -2,6 +2,7 @@ import 'package:Vibes/services/AudioPlayerState.dart';
 import 'package:Vibes/services/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -23,6 +24,10 @@ void main() async {
   WidgetsBinding widgetsFlutterBinding =
       WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsFlutterBinding);
+  
+  // .env 파일 로드
+  await dotenv.load(fileName: ".env");
+  
   await Hive.initFlutter();
 
   Hive.registerAdapter(VideoModelAdapter());

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Vibes/model/VideoModel.dart';
 import 'package:Vibes/services/YoutubeMusicChartState.dart';
+import 'package:Vibes/services/RecentlyDownloadedState.dart';
 import 'package:Vibes/services/utils.dart';
 import 'package:Vibes/components/horizontal_chart_tile.dart';
+import 'package:Vibes/components/recently_downloaded_tile.dart';
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
@@ -18,11 +20,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Consumer<YoutubeMusicChartState>(
-        builder: (context, chartState, child) {
+      child: Consumer2<YoutubeMusicChartState, RecentlyDownloadedState>(
+        builder: (context, chartState, recentlyDownloadedState, child) {
           return RefreshIndicator(
             onRefresh: () async {
-              await chartState.refreshChart();
+              await Future.wait([
+                chartState.refreshChart(),
+                recentlyDownloadedState.refresh(),
+              ]);
             },
             child: Column(
               children: [
@@ -102,7 +107,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 // 차트 리스트
                 Expanded(
                   child: SingleChildScrollView(
-                    child: _buildChartContent(chartState),
+                    child: Column(
+                      children: [
+                        _buildRecentlyDownloadedSection(recentlyDownloadedState),
+                        _buildChartContent(chartState),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -235,6 +245,105 @@ class _HomeScreenState extends State<HomeScreen> {
         
         // 추가 공간 (향후 다른 섹션 추가 가능)
         SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildRecentlyDownloadedSection(RecentlyDownloadedState recentlyDownloadedState) {
+    // Show loading state
+    if (recentlyDownloadedState.isLoading) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 섹션 타이틀
+          Padding(
+            padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 4),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.download_done,
+                  color: Colors.green[600],
+                  size: 24,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  "최근 다운로드한 음악",
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          // Loading indicator
+          SizedBox(
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          SizedBox(height: 8),
+          Divider(height: 1, thickness: 0.3, indent: 16, endIndent: 16),
+        ],
+      );
+    }
+
+    // Don't show the section if no downloads
+    if (recentlyDownloadedState.recentlyDownloaded.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 섹션 타이틀
+        Padding(
+          padding: EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 4),
+          child: Row(
+            children: [
+              Icon(
+                Icons.download_done,
+                color: Colors.green[600],
+                size: 24,
+              ),
+              SizedBox(width: 8),
+              Text(
+                "최근 다운로드한 음악",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+            ],
+          ),
+        ),
+
+        // 다운로드된 음악 리스트 (가로 스크롤)
+        SizedBox(
+          height: 200,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            itemCount: recentlyDownloadedState.recentlyDownloaded.length,
+            itemBuilder: (context, index) {
+              final VideoModel video = recentlyDownloadedState.recentlyDownloaded[index];
+              return RecentlyDownloadedTile(
+                video: video,
+                onTap: () {
+                  showDetailVideoFromModel(
+                      selectedVideo: video, context: context);
+                },
+              );
+            },
+          ),
+        ),
+        
+        // 섹션 간 구분
+        SizedBox(height: 8),
+        Divider(height: 1, thickness: 0.3, indent: 16, endIndent: 16),
       ],
     );
   }

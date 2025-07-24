@@ -36,6 +36,10 @@ class VideoModel {
   @HiveField(7)
   String? audioPath;
 
+  /// 다운로드된 날짜와 시간
+  @HiveField(8)
+  DateTime? downloadDate;
+
   // 생성자
   VideoModel({
     required this.videoId,
@@ -46,5 +50,6 @@ class VideoModel {
     required this.uploadDate,
     required this.thumbnailUrls,
     this.audioPath,
+    this.downloadDate,
   });
 }

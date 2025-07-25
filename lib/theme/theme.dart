@@ -124,7 +124,7 @@ ThemeData darkMode() {
         fontWeight: FontWeight.bold,
       ),
       subtitleTextStyle: GoogleFonts.notoSansKr(
-        color: Color(0xFF606060),
+        color: Colors.white70,
         fontSize: 12,
         fontWeight: FontWeight.w400,
       ),

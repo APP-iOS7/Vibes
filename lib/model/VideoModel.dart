@@ -40,6 +40,10 @@ class VideoModel {
   @HiveField(8)
   DateTime? downloadDate;
 
+  /// 플레이리스트에서의 순서
+  @HiveField(9)
+  int? playlistOrder;
+
   // 생성자
   VideoModel({
     required this.videoId,
@@ -51,5 +55,6 @@ class VideoModel {
     required this.thumbnailUrls,
     this.audioPath,
     this.downloadDate,
+    this.playlistOrder,
   });
 }

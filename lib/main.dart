@@ -104,6 +104,7 @@ class MainScreen extends StatefulWidget {
 class _NavigationExampleState extends State<MainScreen> {
   int currentPageIndex = 0;
   String titleName = "Vibes";
+  bool _isPlaylistEditMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -112,6 +113,26 @@ class _NavigationExampleState extends State<MainScreen> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         centerTitle: true,
         title: Text(titleName, style: Theme.of(context).textTheme.titleLarge),
+        actions: currentPageIndex == 1 ? [
+          Consumer<PlayListState>(
+            builder: (context, playListState, child) {
+              if (playListState.playlist.isEmpty) {
+                return SizedBox.shrink();
+              }
+              return IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isPlaylistEditMode = !_isPlaylistEditMode;
+                  });
+                },
+                icon: Icon(
+                  _isPlaylistEditMode ? Icons.check : Icons.edit,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+              );
+            },
+          ),
+        ] : null,
       ),
       body: Stack(
         children: [
@@ -125,7 +146,14 @@ class _NavigationExampleState extends State<MainScreen> {
             ),
 
             // 음악재생 페이지
-            PlayListScreen(),
+            PlayListScreen(
+              isEditMode: _isPlaylistEditMode,
+              onEditModeChanged: (bool editMode) {
+                setState(() {
+                  _isPlaylistEditMode = editMode;
+                });
+              },
+            ),
 
             // 검색 페이지
             YoutubeSearchScreen(

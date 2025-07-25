@@ -6,13 +6,15 @@ import 'package:provider/provider.dart';
 
 class PlayListTile2 extends StatelessWidget {
   final VideoModel video;
+  final bool isEditMode;
+  final int? index;
 
-  const PlayListTile2({required this.video, super.key});
+  const PlayListTile2({required this.video, this.isEditMode = false, this.index, super.key});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () async {
+      onTap: isEditMode ? null : () async {
         Provider.of<AudioPlayerState>(context, listen: false).isSongPlaying =
             true;
         final player =
@@ -60,6 +62,13 @@ class PlayListTile2 extends StatelessWidget {
           ),
         ],
       ),
+      trailing: isEditMode && index != null ? ReorderableDragStartListener(
+        index: index!,
+        child: Icon(
+          Icons.drag_handle,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+        ),
+      ) : null,
     );
   }
 }

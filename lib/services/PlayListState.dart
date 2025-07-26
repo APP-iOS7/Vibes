@@ -25,7 +25,17 @@ class PlayListState extends ChangeNotifier {
   // 초기 실행할 함수
   Future<void> _initPlaylist() async {
     _playlist.clear();
-    _playlist.addAll(_playlistBox.values.toList());
+    final videos = _playlistBox.values.toList();
+    
+    // playlistOrder에 따라 정렬, null인 경우 맨 뒤로
+    videos.sort((a, b) {
+      if (a.playlistOrder == null && b.playlistOrder == null) return 0;
+      if (a.playlistOrder == null) return 1;
+      if (b.playlistOrder == null) return -1;
+      return a.playlistOrder!.compareTo(b.playlistOrder!);
+    });
+    
+    _playlist.addAll(videos);
     notifyListeners();
   }
 
@@ -51,10 +61,24 @@ class PlayListState extends ChangeNotifier {
 
   // 플레이 리스트에 비디오 객체를 추가하는 코드 CRUD -> Create
   Future<List<VideoModel>> createPlayList(VideoModel video) async {
-    _playlist.add(video); // 관리되고 있는 List에 저장
+    // 새 비디오에 playlistOrder 설정 (맨 마지막 순서)
+    final videoWithOrder = VideoModel(
+      videoId: video.videoId,
+      duration: video.duration,
+      title: video.title,
+      channelName: video.channelName,
+      views: video.views,
+      uploadDate: video.uploadDate,
+      thumbnailUrls: video.thumbnailUrls,
+      audioPath: video.audioPath,
+      downloadDate: video.downloadDate,
+      playlistOrder: _playlist.length,
+    );
+    
+    _playlist.add(videoWithOrder); // 관리되고 있는 List에 저장
 
     // HIVE DB에 데이터 저장장
-    await _playlistBox.put(video.videoId, video);
+    await _playlistBox.put(videoWithOrder.videoId, videoWithOrder);
 
     notifyListeners();
     // hive db에 저장
@@ -77,6 +101,37 @@ class PlayListState extends ChangeNotifier {
 
     // 파일 경로에 있는 mp3 파일 삭제도 해야 합니다.
     await FileServices.instance.deleteVideo(videoId: videoId);
+    notifyListeners();
+  }
+
+  // 플레이리스트 순서 재조정 메서드
+  Future<void> reorderPlaylist(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    
+    final VideoModel item = _playlist.removeAt(oldIndex);
+    _playlist.insert(newIndex, item);
+    
+    // 모든 비디오의 playlistOrder 업데이트
+    for (int i = 0; i < _playlist.length; i++) {
+      _playlist[i] = VideoModel(
+        videoId: _playlist[i].videoId,
+        duration: _playlist[i].duration,
+        title: _playlist[i].title,
+        channelName: _playlist[i].channelName,
+        views: _playlist[i].views,
+        uploadDate: _playlist[i].uploadDate,
+        thumbnailUrls: _playlist[i].thumbnailUrls,
+        audioPath: _playlist[i].audioPath,
+        downloadDate: _playlist[i].downloadDate,
+        playlistOrder: i,
+      );
+      
+      // Hive DB에 업데이트된 순서 저장
+      await _playlistBox.put(_playlist[i].videoId, _playlist[i]);
+    }
+    
     notifyListeners();
   }
 

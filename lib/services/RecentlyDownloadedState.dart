@@ -114,7 +114,67 @@ class RecentlyDownloadedState extends ChangeNotifier {
 
   // Called when playlist changes
   void _onPlaylistChanged() {
-    _loadRecentlyDownloaded();
+    _updateRecentlyDownloaded();
+  }
+  
+  // Update recently downloaded list incrementally instead of full reload
+  Future<void> _updateRecentlyDownloaded() async {
+    try {
+      // Get the latest playlist
+      final currentPlaylist = _playListState.playlist;
+      
+      // Check for new downloads by comparing with existing recent list
+      final List<VideoModel> newDownloads = [];
+      
+      for (VideoModel video in currentPlaylist) {
+        // Skip if video already in recent downloads
+        if (_recentlyDownloaded.any((existing) => existing.videoId == video.videoId)) {
+          continue;
+        }
+        
+        // Check if this is a newly downloaded video
+        if (video.videoId != null && 
+            video.audioPath != null && 
+            video.audioPath!.isNotEmpty &&
+            video.downloadDate != null) {
+          
+          bool fileExists = await FileServices.instance.isVideoDownloaded(videoId: video.videoId!);
+          if (fileExists) {
+            newDownloads.add(video);
+            print('[RecentlyDownloadedState] New download detected: ${video.title}');
+          }
+        }
+      }
+      
+      // Add new downloads to the front of the list
+      if (newDownloads.isNotEmpty) {
+        // Sort new downloads by download date (newest first)
+        newDownloads.sort((a, b) {
+          if (a.downloadDate != null && b.downloadDate != null) {
+            return b.downloadDate!.compareTo(a.downloadDate!);
+          }
+          return 0;
+        });
+        
+        // Add to front and maintain max 10 items
+        _recentlyDownloaded.insertAll(0, newDownloads);
+        _recentlyDownloaded = _recentlyDownloaded.take(10).toList();
+        
+        print('[RecentlyDownloadedState] Updated with ${newDownloads.length} new downloads. Total: ${_recentlyDownloaded.length}');
+        notifyListeners();
+      }
+      
+      // Periodically do a full refresh to clean up invalid entries
+      // Only do this occasionally to avoid performance issues
+      if (_recentlyDownloaded.length >= 8) {
+        await _loadRecentlyDownloaded();
+      }
+      
+    } catch (e) {
+      print('[RecentlyDownloadedState] Error updating recently downloaded: $e');
+      // Fall back to full reload on error
+      await _loadRecentlyDownloaded();
+    }
   }
 
   // Refresh the recently downloaded list

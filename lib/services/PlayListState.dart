@@ -14,34 +14,54 @@ class PlayListState extends ChangeNotifier {
 
   // 생성자에서 Hive에서 데이터 로드
   PlayListState() {
-    _initPlaylist();
     // 싱글톤 인스턴스 설정
     _instance = this;
+    // 즉시 동기 데이터 로드
+    _loadPlaylistSync();
+    // 비동기 초기화는 별도로 실행
+    _initPlaylistAsync();
   }
   
   // 싱글톤 인스턴스 접근자
   static PlayListState? get instance => _instance;
 
-  // 초기 실행할 함수
-  Future<void> _initPlaylist() async {
+  // 동기적으로 데이터 로드 (UI 즉시 업데이트용)
+  void _loadPlaylistSync() {
     _playlist.clear();
     final videos = _playlistBox.values.toList();
-    
-    // playlistOrder에 따라 정렬, null인 경우 맨 뒤로
-    videos.sort((a, b) {
-      if (a.playlistOrder == null && b.playlistOrder == null) return 0;
-      if (a.playlistOrder == null) return 1;
-      if (b.playlistOrder == null) return -1;
-      return a.playlistOrder!.compareTo(b.playlistOrder!);
-    });
-    
     _playlist.addAll(videos);
+    // 즉시 UI 업데이트
     notifyListeners();
+    print('[PlayListState] Sync loaded ${_playlist.length} videos');
   }
+  
+  // 비동기 초기화 (정렬 처리)
+  Future<void> _initPlaylistAsync() async {
+    try {
+      final videos = _playlistBox.values.toList();
+      
+      // playlistOrder에 따라 정렬, null인 경우 맨 뒤로
+      videos.sort((a, b) {
+        if (a.playlistOrder == null && b.playlistOrder == null) return 0;
+        if (a.playlistOrder == null) return 1;
+        if (b.playlistOrder == null) return -1;
+        return a.playlistOrder!.compareTo(b.playlistOrder!);
+      });
+      
+      _playlist.clear();
+      _playlist.addAll(videos);
+      notifyListeners();
+      print('[PlayListState] Async sorted ${_playlist.length} videos');
+    } catch (e) {
+      print('[PlayListState] Error in async init: $e');
+    }
+  }
+  
 
   // 모든 플레이리스트 데이터 갱신 CRUD -> Update
   Future<void> refreshPlaylist() async {
-    await _initPlaylist();
+    _loadPlaylistSync(); // 즉시 동기 로드
+    await _initPlaylistAsync(); // 이후 비동기 정렬
   }
 
   // 특정 비디오의 정보를 업데이트하는 메서드 추가
